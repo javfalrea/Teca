@@ -1,0 +1,59 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Genero;
+
+@Service
+public class GeneroService {
+	
+	static {
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static Connection conexion(String ruta, String user, String password) throws SQLException {
+		return DriverManager.getConnection(ruta, user, password);
+	}
+	
+	public static Long obtenerClaveGenerada(PreparedStatement ps) throws SQLException {
+		ResultSet claveGenerada = ps.getGeneratedKeys();
+		if(claveGenerada.next()) {
+			return claveGenerada.getLong(1);
+		} else {
+			throw new SQLException("No se pudo obtener el id del género asociado.");
+		}
+	}
+	
+	public Genero crear(String nombre) throws SQLException {
+		Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/teca", "root", "");
+		
+		String insertGenero = "INSERT INTO genero (nombre) VALUES (?)";
+		PreparedStatement ps = conn.prepareStatement(insertGenero, Statement.RETURN_GENERATED_KEYS);
+		ps.setString(1, nombre);
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido crear el género");
+		}
+		
+		Long id = obtenerClaveGenerada(ps);
+		
+		Genero genero = new Genero(id, nombre);
+		
+		ps.close();
+		conn.close();
+		
+		return genero;
+	}
+
+}

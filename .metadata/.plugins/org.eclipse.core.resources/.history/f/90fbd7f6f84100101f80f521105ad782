@@ -1,0 +1,161 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Pais;
+import com.teca.entities.Pelicula;
+import com.teca.util.General;
+
+@Service
+public class PeliculaService {
+	
+	@Autowired
+	private PaisService p;
+	
+	public Pelicula crear(String titulo, String tituloOriginal, Integer anioEstreno, Integer duracion, String sinopsis, String imagen, Long idPais) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String insertPelicula = "INSERT INTO pelicula (titulo, titulo_original, anio_estreno, duracion, sinopsis, imagen, id_pais) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		
+		PreparedStatement ps = conn.prepareStatement(insertPelicula, Statement.RETURN_GENERATED_KEYS);
+		ps.setString(1, titulo);
+		ps.setString(2, tituloOriginal);
+		ps.setInt(3, anioEstreno);
+		ps.setInt(4, duracion);
+		ps.setString(5, sinopsis);
+		ps.setString(6, imagen);
+		ps.setLong(7, idPais);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido crear la película");
+		}
+		
+		Long id = General.obtenerClaveGenerada(ps);
+		
+		Pais pais = p.buscarPorPelicula(id);
+		
+		Pelicula pelicula = new Pelicula(id, titulo, tituloOriginal, anioEstreno, duracion, sinopsis, imagen, pais);
+		
+		ps.close();
+		conn.close();
+		
+		return pelicula;
+	}
+	
+	public Pelicula modificar(Long id, String titulo, String tituloOriginal, Integer anioEstreno, Integer duracion, String sinopsis, String imagen, Long idPais) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String updatePelicula = "UPDATE pelicula SET titulo = ?, titulo_original = ?, anio_estreno = ?, duracion = ?, sinopsis = ?, imagen = ?, id_pais = ? WHERE id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(updatePelicula);
+		ps.setString(1, titulo);
+		ps.setString(2, tituloOriginal);
+		ps.setInt(3, anioEstreno);
+		ps.setInt(4, duracion);
+		ps.setString(5, sinopsis);
+		ps.setString(6, imagen);
+		ps.setLong(7, idPais);
+		ps.setLong(8, id);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido modificar la película");
+		}
+		
+		Pais pais = p.buscarPorPelicula(id);
+		
+		Pelicula pelicula = new Pelicula(id, titulo, tituloOriginal, anioEstreno, duracion, sinopsis, imagen, pais);
+		
+		ps.close();
+		conn.close();
+		
+		return pelicula;
+	}
+	
+	public void eliminar(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String deletePelicula = "DELETE FROM pelicula WHERE id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(deletePelicula);
+		ps.setLong(1, id);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido eliminar la película");
+		}
+				
+		ps.close();
+		conn.close();
+	}
+	
+	public List<Pelicula> buscarTodo() throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectPelicula = "SELECT * FROM pelicula";
+		
+		PreparedStatement ps = conn.prepareStatement(selectPelicula);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Pelicula> peliculas = new ArrayList<Pelicula>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String titulo = rs.getString("titulo");
+			String tituloOriginal = rs.getString("titulo_original");
+			Integer anioEstreno = rs.getInt("anio_estreno");
+			Integer duracion = rs.getInt("duracion");
+			String sinopsis = rs.getString("sinopsis");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = p.buscarPorPelicula(id);
+			
+			Pelicula pelicula = new Pelicula(id, titulo, tituloOriginal, anioEstreno, duracion, sinopsis, imagen, pais);
+			peliculas.add(pelicula);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return peliculas;
+	}
+	
+	public Pelicula buscarPorId(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectPelicula = "SELECT * FROM pelicula WHERE id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectPelicula);
+		ps.setLong(1, id);
+		
+		ResultSet rs = ps.executeQuery();
+		rs.next();
+		String titulo = rs.getString("titulo");
+		String tituloOriginal = rs.getString("titulo_original");
+		Integer anioEstreno = rs.getInt("anio_estreno");
+		Integer duracion = rs.getInt("duracion");
+		String sinopsis = rs.getString("sinopsis");
+		String imagen = rs.getString("imagen");
+			
+		Pais pais = p.buscarPorPelicula(id);
+			
+		Pelicula pelicula = new Pelicula(id, titulo, tituloOriginal, anioEstreno, duracion, sinopsis, imagen, pais);
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return pelicula;
+	}
+
+}

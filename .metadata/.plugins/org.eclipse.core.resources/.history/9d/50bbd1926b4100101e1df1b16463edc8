@@ -1,0 +1,5 @@
+package com.teca.entities;
+
+public class LibroParticipante {
+
+}

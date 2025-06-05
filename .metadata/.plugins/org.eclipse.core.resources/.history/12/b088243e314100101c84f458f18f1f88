@@ -1,0 +1,60 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Genero;
+import com.teca.util.General;
+
+@Service
+public class GeneroService {
+	
+	public Genero crear(String nombre) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String insertGenero = "INSERT INTO genero (nombre) VALUES (?)";
+		PreparedStatement ps = conn.prepareStatement(insertGenero, Statement.RETURN_GENERATED_KEYS);
+		ps.setString(1, nombre);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido crear el género");
+		}
+		
+		Long id = General.obtenerClaveGenerada(ps);
+		
+		Genero genero = new Genero(id, nombre);
+		
+		ps.close();
+		conn.close();
+		
+		return genero;
+	}
+	
+	public Genero modificar(Long id, String nombre) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String updateGenero = "UPDATE genero SET nombre = ? WHERE id = ?";
+		PreparedStatement ps = conn.prepareStatement(updateGenero);
+		ps.setString(1, nombre);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido crear el género");
+		}
+		
+		Genero genero = new Genero(id, nombre);
+		
+		ps.close();
+		conn.close();
+		
+		return genero;
+	}
+	
+	
+
+}

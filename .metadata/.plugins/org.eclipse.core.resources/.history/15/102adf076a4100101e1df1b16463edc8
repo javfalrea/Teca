@@ -1,0 +1,72 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Genero;
+import com.teca.entities.Libro;
+import com.teca.entities.LibroGenero;
+import com.teca.entities.Pelicula;
+import com.teca.entities.PeliculaGenero;
+import com.teca.util.General;
+
+@Service
+public class PeliculaGeneroService {
+	
+	@Autowired
+	private PeliculaService p;
+	
+	@Autowired 
+	private GeneroService g;
+	
+	public PeliculaGenero agregar(Long idPelicula, Long idGenero) throws SQLException {
+		Connection conn = General.conexion();
+
+		String insertAgregacion = "INSERT INTO pelicula_genero (id_pelicula, id_genero) VALUES (?, ?)";
+		
+		PreparedStatement ps = conn.prepareStatement(insertAgregacion, Statement.RETURN_GENERATED_KEYS);
+		ps.setLong(1, idPelicula);
+		ps.setLong(2, idGenero);
+
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido asignar el género a la película");
+		}
+		
+		Pelicula pelicula = p.buscarPorId(idPelicula);
+		
+		Genero genero = g.buscarPorId(idGenero);
+		
+		PeliculaGenero peliculaGenero = new PeliculaGenero(pelicula, genero);
+		
+		ps.close();
+		conn.close();
+		
+		return peliculaGenero;
+	}
+	
+	public void desagregar(Long idPelicula, Long idGenero) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String deleteAgregacion = "DELETE FROM pelicula_genero WHERE id_pelicula = ? AND id_genero = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(deleteAgregacion);
+		ps.setLong(1, idPelicula);
+		ps.setLong(2, idGenero);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido desagregar el género de la película");
+		}
+				
+		ps.close();
+		conn.close();
+	}
+
+}

@@ -1,0 +1,60 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Genero;
+import com.teca.entities.LibroGenero;
+import com.teca.util.General;
+
+@Service
+public class LibroGeneroService {
+	
+	public LibroGenero agregar(Long idLibro, Long idGenero) throws SQLException {
+		Connection conn = General.conexion();
+
+		String insertAgregacion = "INSERT INTO libro_genero (id_libro, id_genero) VALUES (?, ?)";
+		
+		PreparedStatement ps = conn.prepareStatement(insertAgregacion, Statement.RETURN_GENERATED_KEYS);
+		ps.setLong(1, idLibro);
+		ps.setLong(2, idGenero);
+
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido asignar el género al libro");
+		}
+		
+		
+		
+		LibroGenero libroGenero = new LibroGenero(idLibro, idGenero);
+		
+		ps.close();
+		conn.close();
+		
+		return genero;
+	}
+	
+	public void eliminar(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String deleteGenero = "DELETE FROM genero WHERE id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(deleteGenero);
+		ps.setLong(1, id);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido eliminar el género");
+		}
+				
+		ps.close();
+		conn.close();
+	}
+
+}

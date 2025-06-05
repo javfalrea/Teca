@@ -1,0 +1,70 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Genero;
+import com.teca.entities.Libro;
+import com.teca.entities.LibroGenero;
+import com.teca.util.General;
+
+@Service
+public class LibroGeneroService {
+	
+	@Autowired
+	private LibroService l;
+	
+	@Autowired 
+	private GeneroService g;
+	
+	public LibroGenero agregar(Long idLibro, Long idGenero) throws SQLException {
+		Connection conn = General.conexion();
+
+		String insertAgregacion = "INSERT INTO libro_genero (id_libro, id_genero) VALUES (?, ?)";
+		
+		PreparedStatement ps = conn.prepareStatement(insertAgregacion, Statement.RETURN_GENERATED_KEYS);
+		ps.setLong(1, idLibro);
+		ps.setLong(2, idGenero);
+
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido asignar el género al libro");
+		}
+		
+		Libro libro = l.buscarPorId(idLibro);
+		
+		Genero genero = g.buscarPorId(idGenero);
+		
+		LibroGenero libroGenero = new LibroGenero(libro, genero);
+		
+		ps.close();
+		conn.close();
+		
+		return libroGenero;
+	}
+	
+	public void desagregar(Long idLibro, Long idGenero) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String deleteAgregacion = "DELETE FROM libro_genero WHERE id_libro = ? AND id_genero = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(deleteAgregacion);
+		ps.setLong(1, idLibro);
+		ps.setLong(2, idGenero);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido desagregar el género del libro");
+		}
+				
+		ps.close();
+		conn.close();
+	}
+
+}

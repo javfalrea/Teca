@@ -1,0 +1,122 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Libro;
+import com.teca.entities.Pelicula;
+import com.teca.util.General;
+
+@Service
+public class PeliculaService {
+	
+	public Pelicula crear(String titulo, String tituloOriginal, Integer anioEstreno, Integer duracion, String sinopsis, String imagen, Long idPais) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String insertPelicula = "INSERT INTO libro (titulo, titulo_original, anio_estreno, duracion, sinopsis, imagen, id_pais) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		
+		PreparedStatement ps = conn.prepareStatement(insertPelicula, Statement.RETURN_GENERATED_KEYS);
+		ps.setString(1, titulo);
+		ps.setString(2, tituloOriginal);
+		ps.setInt(3, anioEstreno);
+		ps.setInt(4, duracion);
+		ps.setString(5, sinopsis);
+		ps.setString(6, imagen);
+		ps.setLong(7, idPais);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido crear la película");
+		}
+		
+		Long id = General.obtenerClaveGenerada(ps);
+		
+		Pelicula pelicula = new Pelicula(id, titulo, tituloOriginal, anioEstreno, duracion, sinopsis, imagen, idPais);
+		
+		ps.close();
+		conn.close();
+		
+		return libro;
+	}
+	
+	public Libro modificar(Long id, String titulo, String tituloOriginal, Integer anioLanzamiento, Integer paginasAprox, String sinopsis, String imagen) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String updateLibro = "UPDATE libro SET titulo = ?, titulo_original = ?, anio_lanzamiento = ?, paginas_aprox = ?, sinopsis = ?, imagen = ? WHERE id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(updateLibro);
+		ps.setString(1, titulo);
+		ps.setString(2, tituloOriginal);
+		ps.setInt(3, anioLanzamiento);
+		ps.setInt(4, paginasAprox);
+		ps.setString(5, sinopsis);
+		ps.setString(6, imagen);
+		ps.setLong(7, id);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido modificar el libro");
+		}
+		
+		Libro libro = new Libro(id, titulo, tituloOriginal, anioLanzamiento, paginasAprox, sinopsis, imagen);
+		
+		ps.close();
+		conn.close();
+		
+		return libro;
+	}
+	
+	public void eliminar(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String deleteLibro = "DELETE FROM libro WHERE id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(deleteLibro);
+		ps.setLong(1, id);
+		
+		int respuesta = ps.executeUpdate();
+		if(respuesta != 1) {
+			throw new SQLException("No se ha podido eliminar el libro");
+		}
+				
+		ps.close();
+		conn.close();
+	}
+	
+	public List<Libro> buscarTodo() throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectLibro = "SELECT * FROM libro";
+		
+		PreparedStatement ps = conn.prepareStatement(selectLibro);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Libro> libros = new ArrayList<Libro>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String titulo = rs.getString("titulo");
+			String tituloOriginal = rs.getString("titulo_original");
+			Integer anioLanzamiento = rs.getInt("anio_lanzamiento");
+			Integer paginasAprox = rs.getInt("paginas_aprox");
+			String sinopsis = rs.getString("sinopsis");
+			String imagen = rs.getString("imagen");
+			
+			Libro libro = new Libro(id, titulo, tituloOriginal, anioLanzamiento, paginasAprox, sinopsis, imagen);
+			libros.add(libro);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return libros;
+	}
+
+}
