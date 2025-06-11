@@ -23,7 +23,7 @@ function cargarDetalleParticipante() {
 			} else {
 				document.getElementById("fallecido").style.display = "block";
 			}
-			document.getElementById("bandera").innerHTML = "<img title='" + p.pais.nombre + "' src='" + p.pais.bandera + "' style='width:16px; height:auto; display:block; margin:auto;'>";
+			document.getElementById("bandera").innerHTML = "<img title='" + p.pais.nombre + "' src='" + encodeURI(p.pais.bandera) + "' style='width:16px; height:auto; display:block; margin:auto;'>";
 			document.getElementById("pais").textContent = p.pais.nombre;
 			document.getElementById("imagen").innerHTML = "<img title='" + p.titulo + "' src='" + encodeURI(p.imagen) + "'>";
 		})

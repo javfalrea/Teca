@@ -21,7 +21,8 @@
 				<p class="info">
 				<p>Fecha de nacimiento <span id="fechaNacimiento"></span></p>
 				<p id="fallecido" style="display:none;">Fecha de fallecimiento <span id="fechaFallecimiento"></span></p>
-				<p>País <div id="bandera"></div><span id="pais"></span></p>
+				<p>País
+				<div id="bandera"></div><span id="pais"></span></p>
 				<h5 id="encabezadoD" style="display:none;">Dirección</h5>
 				<p id="directorP" style="display:none;">Películas</p>
 				<ul id="peliculaDirector"></ul>

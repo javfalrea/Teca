@@ -41,8 +41,8 @@
             <input type="text" name="titulo" id="titulo">
 			<label for="tituloOriginal">Título Original</label>
 			<input type="text" name="tituloOriginal" id="tituloOriginal">
-            <label for="anioLanzamiento">Año de lanzamiento</label>
-            <input type="number" name="anioLanzamiento" id="anioLanzamiento">
+            <label for="anioEstreno">Año de lanzamiento</label>
+            <input type="number" name="anioEstreno" id="anioEstreno">
 			<label for="paginasAprox">Páginas aproximadas</label>
 			<input type="number" name="paginasAprox" id="paginasAprox">
             <label for="sinopsis">Sinopsis</label>

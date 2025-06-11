@@ -43,7 +43,7 @@
 		</div>
 		<div class="funcionalidadesAgregar">
 			<button id="botonAgregarGenero" onclick="abrirAgregarGenero()">Agregar género</button>
-			<button id="botonAgregarParticipante" onclick="abrirAgregarParticipante()">Agregar autor</button>
+			<button id="botonAgregarParticipante" onclick="abrirAgregarParticipante()">Agregar participante</button>
 		</div>
 		<div class="modificar">
 			<button id="botonModificarLibro" onclick="abrirModificarLibro()">Modificar libro</button>
