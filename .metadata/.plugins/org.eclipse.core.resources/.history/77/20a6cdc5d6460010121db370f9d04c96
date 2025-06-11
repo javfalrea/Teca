@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Detalle de Temporada</title>
+	<link rel="stylesheet" href="detalles.css">
+</head>
+
+<body onload="cargarDetalleTemporada()">
+
+	<div class="paginas">
+		<button onclick="volverPaginaSerie()">Volver</button>
+	</div>
+	<div id="detalle">
+		<h1><span id="titulo"></span></h1>
+		<p class="info">
+		<p>Numero <span id="numero"></span></p>
+		<p>Año de estreno <span id="anioEstreno"></span></p>
+		<p>Número capítulos <span id="numCapitulos"></span></p>
+		<p>Duración media <span id="duracionMedia"></span></p>
+		<p>Sinopsis <span id="sinopsis"></span></p>
+	</div>
+	<div class="imagenYValoracion">
+		<div id="imagen"></div>
+	</div>
+	
+	<div class="modificar">
+		<button id="botonModificarTemporada" onclick="abrirModificarTemporada()">Modificar temporada</button>
+	</div>
+		
+		<div id="modalTemporada" class="modal" style="display: none;">
+		        <div class="contenidoModal">
+		            <h2 style="text-align: center;">Nueva temporada</h2>
+		            <label for="numeroT">Numero</label>
+		            <input type="number" name="numeroT" id="numeroT">
+					<label for="anioEstrenoT">Año de estreno</label>
+					<input type="number" name="anioEstrenoT" id="anioEstrenoT">
+		            <label for="numCapitulosT">Numéro de capítulos</label>
+		            <input type="number" name="numCapitulosT" id="numCapitulosT">
+					<label for="duracionMediaT">Duración media</label>
+					<input type="number" name="duracionMediaT" id="duracionMediaT">
+		            <label for="sinopsisT">Sinopsis</label>
+		            <textarea name="sinopsisT" id="sinopsisT"></textarea>
+					
+		            <div style="display: flex; justify-content: space-around;">
+						<button onclick="crearTemporada()">Aceptar</button>
+						<button onclick="cerrarCrearTemporada()">Cancelar</button>
+					</div>
+					<input type="hidden" id="idTemporada">
+		           
+		        </div>
+		    </div>
+
+	<script src="/js/detalleTemporada.js"></script>
+
+</body>
+
+</html>

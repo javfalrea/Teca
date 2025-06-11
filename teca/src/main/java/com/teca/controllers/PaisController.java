@@ -63,7 +63,7 @@ public class PaisController {
 	}
 	
 	@GetMapping("/buscarPorNombre")
-	public ResponseEntity<?> buscarPorNombre(@RequestParam String nombre) {
+	public ResponseEntity<?> buscarPorNombre(@RequestParam(required=false) String nombre) {
 		try {
 			return ResponseEntity.ok().body(s.buscarPorNombre(nombre)); 
 		} catch (SQLException e) {

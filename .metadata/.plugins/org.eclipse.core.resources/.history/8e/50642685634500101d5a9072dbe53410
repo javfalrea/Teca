@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Países</title>
+    <link rel="stylesheet" href="tablas.css">
+</head>
+<body>
+
+    <h1>Países</h1>
+
+    <div class="filtros">   
+		<input type="text" id="nombrePais" placeholder="País">
+		<button id="buscarPaises" onclick="buscarPaises()">Buscar</button>      
+        <button id="botonCrearPais" onclick="abrirCrearPais()">Insertar País</button>
+    </div>
+
+    <table id="tablaPaises">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Continente</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="contenidoTabla"></tbody>
+    </table>
+
+    <div id="modalPais" class="modal" style="display: none;">
+        <div class="contenidoModal">
+            <h2 style="text-align: center;">Nuevo País</h2>
+            <label for="nombre">Nombre</label>
+            <input type="text" name="nombre" id="nombre">
+            <label for="bandera">Bandera</label>
+            <input type="text" name="bandera" id="bandera">
+
+            <div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarPais()">Aceptar</button>
+				<button onclick="cerrarCrearPais()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idPais">
+           
+        </div>
+    </div>
+
+    <script src="/js/pais.js"></script>
+</body>
+</html>

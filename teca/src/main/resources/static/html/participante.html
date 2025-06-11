@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participantes</title>
+    <link rel="stylesheet" href="../css/tabla.css">
+</head>
+<body onLoad="cargaInicial()">
+	
+	<div class="paginas">
+	    <button onclick="location.href='index.html'">Volver</button>
+	</div>
+
+    <h1>Participantes</h1>
+
+    <div class="filtros">
+        <input type="text" id="nombreFiltro" placeholder="Participante">
+        <button id="botonBuscar" onclick="buscarParticipantes()">Buscar</button>
+        <button id="botonCrear" onclick="abrirCrearParticipante()">Insertar Participante</button>
+    </div>
+
+    <table id="tabla">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Fecha de nacimiento</th>
+                <th>País</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="contenidoTabla"></tbody>
+    </table>
+
+    <div id="modalParticipante" class="modal" style="display: none;">
+        <div class="contenidoModal">
+            <h2 style="text-align: center;">Nuevo participante</h2>
+            <label for="nombre">Nombe</label>
+            <input type="text" name="nombre" id="nombre">
+			<label for="fechaNacimiento">Fecha de nacimiento</label>
+			<input type="date" name="fechaNacimiento" id="fechaNacimiento">
+            <label for="fechaFallecimiento">Fecha de fallecimiento (Dejar en blanco si no procede)</label>
+            <input type="date" name="fechaFallecimiento" id="fechaFallecimiento">
+            <label for="pais">País</label>
+            <select name="pais" id="pais"></select>
+			<label for="imagen">URL Imagen</label>
+			<input type="text" name="imagen" id="imagen">
+
+            <div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarParticipante()">Aceptar</button>
+				<button onclick="cerrarCrearParticipante()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idParticipante">
+           
+        </div>
+    </div>
+
+    <script src="/js/participante.js"></script>
+</body>
+</html>

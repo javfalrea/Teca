@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+	<link rel="stylesheet" href="../css/index.css">
+
+</head>
+<body>
+	<h1>JaviTeca</h1>
+	<div class="opcionesPrincipales"></div>
+		<button onclick="location.href='pelicula.html'">Películas</button></body>
+		<button onclick="location.href='serie.html'">Series</button></body>
+		<button onclick="location.href='libro.html'">Libros</button></body>
+		<button onclick="location.href='participante.html'">Participantes</button></body>
+	</html>
+	<div class="opcionesSecundarias">
+		<button onclick="location.href='pais.html'">Países</button></body>
+		<button onclick="location.href='genero.html'">Géneros</button></body>
+	</div>
+</body>
+</html>

@@ -78,5 +78,14 @@ public class TemporadaController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
+	
+	@GetMapping("/buscarPorId")
+	public ResponseEntity<?> buscarPorId(@RequestParam Long id) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorId(id)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
 
 }

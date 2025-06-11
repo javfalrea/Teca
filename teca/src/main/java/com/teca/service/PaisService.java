@@ -141,6 +141,10 @@ public class PaisService {
 	public List<Pais> buscarPorNombre(String nombreBq) throws SQLException {
 		Connection conn = General.conexion();
 		
+		if (nombreBq == null || nombreBq.trim().isEmpty()) {
+			nombreBq = "";
+	    }
+		
 		String selectPais = "SELECT * FROM pais WHERE LOWER(nombre) LIKE ?";
 		
 		PreparedStatement ps = conn.prepareStatement(selectPais);

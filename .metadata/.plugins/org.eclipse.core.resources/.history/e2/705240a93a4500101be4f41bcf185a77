@@ -1,0 +1,174 @@
+function buscarSeries() {
+	var titulo = encodeURIComponent(document.getElementById("tituloFiltro").value.trim());
+	var participante = encodeURIComponent(document.getElementById("participanteFiltro").value.trim());
+	var generoStr = document.getElementById("generoFiltro").value;
+	var genero = parseInt(generoStr);
+	if (isNaN(genero)) {
+		genero = 0;
+	}
+
+	fetch("http://localhost:9999/serie/busquedaAvanzada?tituloBq=" + titulo + "&participanteBq=" + participante + "&idGenero=" + genero)
+		.then(res => res.text())
+		.then(json => {
+			let posts;
+			try {
+				posts = JSON.parse(json);
+			} catch (err) {
+				console.error("Error al parsear JSON inicial:", err.message, "\nRespuesta recibida:", json);
+				return;
+			}
+
+			let filasTabla = [];
+
+			const promesas = posts.map(fila => {
+				const idSerie = fila.id;
+
+				const promesaDirector = fetch("http://localhost:9999/participante/buscarDirectorPorSerie?id=" + idSerie)
+					.then(res => res.text())
+					.then(jsonDir => {
+						try {
+							const directores = JSON.parse(jsonDir);
+							return (directores && directores.length > 0)
+								? directores.map(d => d.nombre).join(", ")
+								: "ND";
+						} catch (err) {
+							console.error("Error al parsear directores:", err.message, "\nRespuesta:", jsonDir);
+							return "ND";
+						}
+					});
+
+				const promesaTemporadas = fetch("http://localhost:9999/temporada/buscarPorSerie?id=" + idSerie) // corregido aquí
+					.then(res => res.text())
+					.then(jsonTemp => {
+						try {
+							const temporadas = JSON.parse(jsonTemp);
+							if (temporadas && temporadas.length > 0) {
+								const anios = temporadas.map(t => t.anioEstreno).filter(a => !isNaN(a));
+								return (anios.length > 0) ? Math.min(...anios) : "ND";
+							} else {
+								return "ND";
+							}
+						} catch (err) {
+							console.error("Error al parsear temporadas:", err.message, "\nRespuesta:", jsonTemp);
+							return "ND";
+						}
+					});
+
+				return Promise.all([promesaDirector, promesaTemporadas]).then(([directorTexto, anioEstreno]) => {
+					let filaHTML = "<tr>";
+					filaHTML += "<td>" + fila.titulo + "</td>";
+					filaHTML += "<td>" + anioEstreno + "</td>";
+					filaHTML += "<td><img title='" + fila.pais.nombre + "' src='" + fila.pais.bandera + "' style='width:16px; height:auto; display:block; margin:auto;'></td>";
+					filaHTML += "<td>" + directorTexto + "</td>";
+					filaHTML += "<td><button onclick=\"eliminarSerie('" + fila.id + "')\">Eliminar</button><button onclick=\"verDetallesSerie('" + fila.id + "')\">Detalles</button></td>";
+					filaHTML += "</tr>";
+
+					filasTabla.push(filaHTML);
+				});
+			});
+
+			Promise.all(promesas).then(() => {
+				var contenidoTabla = document.getElementById("contenidoTabla");
+				contenidoTabla.innerHTML = filasTabla.join("");
+			});
+		})
+		.catch(e => {
+			console.log('Error importando archivo: ' + e.message);
+		});
+}
+
+
+function verDetallesSerie(idSerie) {
+	window.location.href = `detalleSerie.html?id=${encodeURIComponent(idSerie)}`;
+}
+
+function abrirCrearSerie() {
+	var modal = document.getElementById("modalSerie");
+	modal.style.display = "block";
+}
+
+function cerrarCrearSerie() {
+	document.getElementById("idSerie").value = "";
+	document.getElementById("titulo").value = "";
+	document.getElementById("tituloOriginal").value = "";
+	document.getElementById("terminada").checked = false;
+	document.getElementById("pais").selectedIndex = 0;
+	document.getElementById("sinopsis").value = "";
+	document.getElementById("imagen").value = "";
+
+	var modal = document.getElementById("modalSerie");
+	modal.style.display = "none";
+}
+
+function gestionarSerie() {
+	var titulo = encodeURIComponent(document.getElementById("titulo").value);
+	var tituloOriginal = encodeURIComponent(document.getElementById("tituloOriginal").value);
+	var terminada = encodeURIComponent(document.getElementById("terminada").value);
+	var pais = encodeURIComponent(document.getElementById("pais").value);
+	var sinopsis = encodeURIComponent(document.getElementById("sinopsis").value);
+	var imagen = encodeURIComponent(document.getElementById("imagen").value);
+
+	var url = "http://localhost:9999/serie/crear?titulo=" + titulo + "&tituloOriginal=" + tituloOriginal +  "&terminada=" + terminada + "&idPais=" + pais + "&sinopsis=" + sinopsis + "&imagen=" + imagen;
+
+	fetch(url, {method:'POST'})
+		.then(res => res.text())
+		.then(res => {
+			buscarSeries();
+			cerrarCrearSerie();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+
+}
+
+function eliminarSerie(idSerie) {
+	if (!confirm("Confirma si quieres eliminarlo")) {
+		return;
+	}
+	fetch("http://localhost:9999/serie/eliminar?id=" + encodeURIComponent(idSerie), {method:'DELETE'})
+		.then(res => res.text())
+		.then(res => {
+			buscarSeries();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		})
+}
+
+function cargaInicial() {
+	let selectPais = document.getElementById("pais");
+	let selectGeneroFiltro = document.getElementById("generoFiltro");
+
+	fetch("http://localhost:9999/pais/buscarTodos")
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectPais.add(opt);
+			posts.forEach(pais => {
+				opt = document.createElement("option");
+				opt.value = pais.id;
+				opt.text = pais.nombre;
+				selectPais.add(opt);
+			});
+		})
+
+	fetch("http://localhost:9999/genero/buscarTodos")
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectGeneroFiltro.add(opt);
+			posts.forEach(genero => {
+				opt = document.createElement("option");
+				opt.value = genero.id;
+				opt.text = genero.nombre;
+				selectGeneroFiltro.add(opt);
+			});
+		})
+}

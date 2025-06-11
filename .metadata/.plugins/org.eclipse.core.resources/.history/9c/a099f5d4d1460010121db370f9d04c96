@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libros</title>
+    <link rel="stylesheet" href="../css/libro.css">
+</head>
+<body onLoad="cargaInicial()">
+	
+	<div class="paginas">
+	    <button onclick="location.href='index.html'">Volver</button>
+	</div>
+
+    <h1>Libros</h1>
+
+    <div class="filtros">
+        <input type="text" id="tituloFiltro" placeholder="Película">
+        <input type="text" id="participanteFiltro" placeholder="Participante">
+        <select id="generoFiltro"></select>
+        <button id="botonBuscarLibros" onclick="buscarLibros()">Buscar</button>
+        <button id="botonCrearLibro" onclick="abrirCrearLibro()">Insertar Libro</button>
+    </div>
+
+    <table id="tablaLibros">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Año de lanzamiento</th>
+                <th>Autor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="contenidoTabla"></tbody>
+    </table>
+
+    <div id="modalLibro" class="modal" style="display: none;">
+        <div class="contenidoModal">
+            <h2 style="text-align: center;">Nuevo Libro</h2>
+            <label for="titulo">Título</label>
+            <input type="text" name="titulo" id="titulo">
+			<label for="tituloOriginal">Título Original</label>
+			<input type="text" name="tituloOriginal" id="tituloOriginal">
+            <label for="anioEstreno">Año de lanzamiento</label>
+            <input type="number" name="anioEstreno" id="anioEstreno">
+			<label for="paginasAprox">Páginas aproximadas</label>
+			<input type="number" name="paginasAprox" id="paginasAprox">
+            <label for="sinopsis">Sinopsis</label>
+            <textarea name="sinopsis" id="sinopsis"></textarea>
+			<label for="imagen">URL Imagen</label>
+			<input type="text" name="imagen" id="imagen">
+
+            <div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarLibro()">Aceptar</button>
+				<button onclick="cerrarCrearLibro()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idLibro">
+           
+        </div>
+    </div>
+
+    <script src="/js/libro.js"></script>
+</body>
+</html>

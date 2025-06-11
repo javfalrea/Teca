@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Detalle de Participante</title>
+	<link rel="stylesheet" href="detalles.css">
+</head>
+
+<body onload="cargarDetalleParticipante(); cargaInicial();">
+
+	<div class="paginas">
+		<button onclick="location.href='/html/participante.html'">Volver</button>
+	</div>
+	<div id="detalleParticipante">
+		<h1><span id="nombre"></span></h1>
+		<p class="info">
+		<p>Fecha de nacimiento <span id="fechaNacimiento"></span></p>
+		<p id="fallecido" style="display:none;">Fecha de fallecimiento <span id="fechaFallecimiento"></span></p>
+		<p>País <div id="bandera"></div><span id="pais"></span></p>
+		<h5 id="encabezadoD" style="display:none;">Dirección</h5>
+		<p id="directorP" style="display:none;">Películas</p>
+		<ul id="peliculaDirector"></ul>
+		<p id="directorS" style="display:none;">Series</p>
+		<ul id="serieDirector"></ul>
+		<h5 id="encabezadoA" style="display:none;">Actuación</h5>
+		<p id="actorP" style="display:none;">Películas</p>
+		<ul id="peliculaActor"></ul>
+		<p id="actorS" style="display:none;">Series</p>
+		<ul id="serieActor"></ul>
+		<p id="escritor" style="display:none;">Libros</p>
+		<ul id="libro"></ul>
+	</div>
+	<div class="imagenYValoracion">
+		<div id="imagen"></div>
+	</div>
+	
+	<div class="modificar">
+		<button id="botonModificarPelicula" onclick="abrirModificarParticipante()">Modificar participante</button>
+	</div>
+	<div id="modalParticipante" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Modificar participante</h2>
+			<label for="nombreP">Nombre</label>
+			<input type="text" name="nombreP" id="nombreP">
+			<label for="fechaNacimientoP">Fecha de nacimiento</label>
+			<input type="date" name="fechaNacimientoP" id="fechaNacimientoP">
+			<label for="fechaFallecimientoP">Fecha de fallecimiento (Dejar en blanco si no procede)</label>
+			<input type="date" name="fechaFallecimientoP" id="fechaFallecimientoP">
+			<label for="paisP">País</label>
+			<select name="paisP" id="paisP"></select>
+			<label for="imagenP">URL Imagen</label>
+			<input type="text" name="imagenP" id="imagenP">
+	
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="modificarParticipante()">Aceptar</button>
+				<button onclick="cerrarCrearParticipante()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idParticipante">
+	
+		</div>
+	</div>
+
+	<script src="/js/detalleParticipante.js"></script>
+
+</body>
+
+</html>

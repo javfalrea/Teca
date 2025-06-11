@@ -9,10 +9,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.teca.service.SerieValoracionService;
 
+@RestController
+@RequestMapping("/serieValoracion")
 public class SerieValoracionController {
 	
 	@Autowired
@@ -20,13 +24,11 @@ public class SerieValoracionController {
 	
 	@PostMapping("/crear")
 	public ResponseEntity<?> crear(@RequestParam Long idSerie,
-			@RequestParam Long idUsuario,
-			@RequestParam Boolean vista,
 			@RequestParam Double valoracion,
 			@RequestParam Boolean fav,
 			@RequestParam String critica) {
 		try {
-			return ResponseEntity.ok().body(s.crear(idSerie, idUsuario, vista, valoracion, fav, critica)); 
+			return ResponseEntity.ok().body(s.crear(idSerie, valoracion, fav, critica)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
@@ -34,38 +36,33 @@ public class SerieValoracionController {
 	
 	@PutMapping("/modificar")
 	public ResponseEntity<?> modificar(@RequestParam Long idSerie,
-			@RequestParam Long idUsuario,
-			@RequestParam Boolean vista,
 			@RequestParam Double valoracion,
 			@RequestParam Boolean fav,
 			@RequestParam String critica) {
 		try {
-			return ResponseEntity.ok().body(s.modificar(idSerie, idUsuario, vista, valoracion, fav, critica)); 
+			return ResponseEntity.ok().body(s.modificar(idSerie, valoracion, fav, critica)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 	
 	@DeleteMapping("/eliminar")
-	public ResponseEntity<?> eliminar(@RequestParam Long idSerie, 
-			@RequestParam Long idUsuario) {
+	public ResponseEntity<?> eliminar(@RequestParam Long idSerie) {
 		try {
-			s.eliminar(idSerie, idUsuario);
+			s.eliminar(idSerie);
 			return ResponseEntity.ok().body("Eliminación correcta"); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 	
-	@GetMapping("/buscarPorSerieYUsuario")
-	public ResponseEntity<?> buscarPorSerieYUsuario(@RequestParam Long idSerie,
-			@RequestParam Long idUsuario) {
+	@GetMapping("/buscarPorId")
+	public ResponseEntity<?> buscarPorId(@RequestParam Long idSerie) {
 		try {
-			return ResponseEntity.ok().body(s.buscarPorSerieYUsuario(idSerie, idUsuario)); 
+			return ResponseEntity.ok().body(s.buscarPorId(idSerie)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
-
 
 }

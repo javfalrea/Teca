@@ -131,7 +131,7 @@ public class TemporadaService {
 	public List<Temporada> buscarPorSerie(Long idSerie) throws SQLException {
 		Connection conn = General.conexion();
 		
-		String selectSerie = "SELECT id, numero, anio_estreno, num_capitulo, duracion_media, sinopsis, id_serie FROM temporada WHERE id_serie = ?";
+		String selectSerie = "SELECT id, numero, anio_estreno, num_capitulos, duracion_media, sinopsis, id_serie FROM temporada WHERE id_serie = ?";
 		
 		PreparedStatement ps = conn.prepareStatement(selectSerie);
 		ps.setLong(1, idSerie);
@@ -157,6 +157,34 @@ public class TemporadaService {
 		conn.close();
 		
 		return temporadas;
+	}
+	
+	public Temporada buscarPorId(Long id) throws SQLException {
+		Connection conn = General.conexion();
+
+		String selectTemporada = "SELECT id, numero, anio_estreno, num_capitulos, duracion_media, sinopsis, id_serie FROM temporada WHERE id = ?";
+
+		PreparedStatement ps = conn.prepareStatement(selectTemporada);
+		ps.setLong(1, id);
+
+		ResultSet rs = ps.executeQuery();
+		rs.next();
+		Integer numero = rs.getInt("numero");
+		Integer anioEstreno = rs.getInt("anio_estreno");
+		Integer numCapitulos = rs.getInt("num_capitulos");
+		Integer duracionMedia = rs.getInt("duracion_media");
+		String sinopsis = rs.getString("sinopsis");
+		Long idSerie = rs.getLong("id_serie");
+
+		Serie serie = s.buscarPorId(idSerie);
+
+		Temporada temporada = new Temporada(id, numero, anioEstreno, numCapitulos, duracionMedia, sinopsis, serie);
+
+		rs.close();
+		ps.close();
+		conn.close();
+
+		return temporada;
 	}
 
 }

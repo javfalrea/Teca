@@ -1,0 +1,102 @@
+function buscarParticipantes() {
+	var nombre = encodeURIComponent(document.getElementById("nombreFiltro").value.trim());
+
+	fetch("http://localhost:9999/participante/buscarPorNombre?nombre=" + nombre)
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let tabla = "";
+			posts.forEach(fila => {
+				tabla += "<tr>";
+				tabla += "<td>" + fila.nombre + "</td>";
+				tabla += "<td>" + fila.fechaNacimiento + "</td>";
+				tabla += "<td><img title='" + fila.pais.nombre + "' src='" + fila.pais.bandera + "' style='width:16px; height:auto; display:block; margin:auto;'></td>";
+				tabla += "<td><button onclick=\"eliminarParticipante('" + fila.id + "')\">Eliminar</button><button onclick=\"verDetallesParticipante('" + fila.id + "')\">Detalles</button></td><td><button onclick=\"abrirAgregarParticipante('" + fila.id + "')\">Agregar participante</button></td>";
+				tabla += "</tr>";
+			});
+
+			var contenidoTabla = document.getElementById("contenidoTabla");
+			contenidoTabla.innerHTML = tabla;
+
+		})
+		.catch(e => {
+			console.log('Error importando archivo: ' + e.message);
+		});
+}
+
+function verDetallesParticipante(idParticipante) {
+	window.location.href = `detalleParticipante.html?id=${encodeURIComponent(idParticipante)}`;
+}
+
+function abrirCrearParticipante() {
+	var modal = document.getElementById("modalParticipante");
+	modal.style.display = "block";
+}
+
+function cerrarCrearParticipante() {
+	document.getElementById("idParticipante").value = "";
+	document.getElementById("nombre").value = "";
+	document.getElementById("fechaNacimiento").value = "";
+	document.getElementById("fechaFallecimiento").value = "";
+	document.getElementById("pais").selectedIndex = 0;
+	document.getElementById("imagen").value = "";
+	
+	var modal = document.getElementById("modalParticipante");
+	modal.style.display = "none";
+}
+
+function gestionarPelicula() {
+	var nombre = encodeURIComponent(document.getElementById("nombre").value);
+	var fechaNacimiento = encodeURIComponent(document.getElementById("fechaNacimiento").value);
+	var fechaFallecimiento = encodeURIComponent(document.getElementById("fechaFallecimiento").value);
+	var pais = encodeURIComponent(document.getElementById("pais").value);
+	var imagen = encodeURIComponent(document.getElementById("imagen").value);
+
+	var url = "http://localhost:9999/participante/crear?nombre=" + nombre + "&fechaNacimiento=" + fechaNacimiento +  "&fechaFallecimiento=" + fechaFallecimiento + "&idPais=" + pais + "&imagen=" + imagen;
+
+	fetch(url, {method:'POST'})
+		.then(res => res.text())
+		.then(res => {
+			buscarParticipantes();
+			cerrarCrearParticipante();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+
+}
+
+function eliminarParticipante(idParticipante) {
+	if (!confirm("Confirma si quieres eliminarlo")) {
+		return;
+	}
+	fetch("http://localhost:9999/participante/eliminar?id=" + encodeURIComponent(idParticipante), {method:'DELETE'})
+		.then(res => res.text())
+		.then(res => {
+			buscarParticipantes();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		})
+}
+
+function cargaInicial() {
+	let selectPais = document.getElementById("pais");
+
+	fetch("http://localhost:9999/pais/buscarTodos")
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectPais.add(opt);
+			posts.forEach(pais => {
+				opt = document.createElement("option");
+				opt.value = pais.id;
+				opt.text = pais.nombre;
+				selectPais.add(opt);
+			});
+		})
+
+}

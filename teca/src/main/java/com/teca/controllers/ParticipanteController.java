@@ -40,7 +40,7 @@ public class ParticipanteController {
 	public ResponseEntity<?> modificar(@RequestParam Long id,
 			@RequestParam String nombre,
 			@RequestParam Date fechaNacimiento,
-			@RequestParam Date fechaFallecimiento,
+			@RequestParam(required=false) Date fechaFallecimiento,
 			@RequestParam String imagen,
 			@RequestParam Long idPais) {
 		try {
@@ -61,9 +61,9 @@ public class ParticipanteController {
 	}
 	
 	@GetMapping("/buscarTodos")
-	public ResponseEntity<?> buscarTodo() {
+	public ResponseEntity<?> buscarTodos() {
 		try {
-			return ResponseEntity.ok().body(s.buscarTodo()); 
+			return ResponseEntity.ok().body(s.buscarTodos()); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
@@ -78,13 +78,58 @@ public class ParticipanteController {
 		}
 	}
 	
-//	@GetMapping("/buscarPorNombre")
-//	public ResponseEntity<?> buscarPorNombre(@RequestParam String nombre) {
-//		try {
-//			return ResponseEntity.ok().body(s.buscarPorNombre(nombre)); 
-//		} catch (SQLException e) {
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-//		}
-//	}
+	@GetMapping("/buscarActorPorPelicula")
+	public ResponseEntity<?> buscarActorPorPelicula(Long id) {
+		try {
+			return ResponseEntity.ok().body(s.buscarActorPorPelicula(id)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarDirectorPorPelicula")
+	public ResponseEntity<?> buscarDirectorPorPelicula(Long id) {
+		try {
+			return ResponseEntity.ok().body(s.buscarDirectorPorPelicula(id)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarActorPorSerie")
+	public ResponseEntity<?> buscarActorPorSerie(Long id) {
+		try {
+			return ResponseEntity.ok().body(s.buscarActorPorSerie(id)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarDirectorPorSerie")
+	public ResponseEntity<?> buscarDirectorPorSerie(Long id) {
+		try {
+			return ResponseEntity.ok().body(s.buscarDirectorPorSerie(id)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarPorLibro")
+	public ResponseEntity<?> buscarPorLibro(Long id) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorLibro(id)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarPorNombre")
+	public ResponseEntity<?> buscarPorNombre(@RequestParam(required=false) String nombre) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorNombre(nombre)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
 
 }

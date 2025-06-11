@@ -1,0 +1,121 @@
+function buscarLibros() {
+	var titulo = document.getElementById("tituloFiltro").value.trim();
+	var autor = document.getElementById("participanteFiltro").value.trim();
+	var generoStr = document.getElementById("generoFiltro").value;
+	var genero = parseInt(generoStr);
+	if (isNaN(genero)) {
+		genero = 0;
+	}
+
+	fetch("http://localhost:9999/libro/busquedaAvanzada?titulo=" + titulo + "&autor=" + autor + "&idGenero=" + genero)
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let tabla = "";
+			posts.forEach(fila => {
+				tabla += "<tr>";
+				tabla += "<td>" + fila.titulo + "</td>";
+				tabla += "<td>" + fila.anioLanzamiento + "</td>";
+				let autores = fila.autores;
+				let autorTexto = "";
+
+				if (autores && autores.length > 0) {
+					autorTexto = autores[0].nombre;
+					if (autores.length > 1) {
+						autorTexto += " y otros";
+					}
+				} else {
+					autorTexto = "Sin autor";
+				}
+
+				tabla += "<td>" + autorTexto + "</td>";
+				tabla += "<td><button onclick=\"eliminarLibro('" + fila.id + "')\">Eliminar</button><button onclick=\"verDetallesLibro('" + fila.id + "')\">Detalles</button></td>";
+				tabla += "</tr>";
+			});
+
+			var contenidoTabla = document.getElementById("contenidoTabla");
+			contenidoTabla.innerHTML = tabla;
+
+		})
+		.catch(e => {
+			console.log('Error importando archivo: ' + e.message);
+		});
+}
+
+function verDetallesLibro(idLibro) {
+	window.location.href = `detalleLibro.html?id=${idLibro}`;
+}
+
+function abrirCrearLibro() {
+	var modal = document.getElementById("modalLibro");
+	modal.style.display = "block";
+}
+
+function cerrarCrearLibro() {
+	document.getElementById("idLibro").value = "";
+	document.getElementById("titulo").value = "";
+	document.getElementById("tituloOriginal").value = "";
+	document.getElementById("anioLanzamiento").value = "";
+	document.getElementById("paginasAprox").value = "";
+	document.getElementById("sinopsis").value = "";
+	document.getElementById("imagen").value = "";
+
+	var modal = document.getElementById("modalLibro");
+	modal.style.display = "none";
+}
+
+function gestionarLibro() {
+	var titulo = document.getElementById("titulo").value;
+	var tituloOriginal = document.getElementById("tituloOriginal").value;
+	var anioLanzamiento = document.getElementById("anioLanzamiento").value;
+	var paginasAprox = document.getElementById("paginasAprox").value;
+	var sinopsis = document.getElementById("sinopsis").value;
+	var imagen = document.getElementById("imagen").value;
+
+	var url = "http://localhost:9999/libro/crear?titulo=" + titulo + "&tituloOriginal=" + tituloOriginal + "&anioLanzamiento=" + anioLanzamiento + "&paginasAprox=" + paginasAprox + "&sinopsis=" + sinopsis + "&imagen=" + imagen;
+
+	fetch(url, { method: 'POST' })
+		.then(res => res.text())
+		.then(res => {
+			buscarLibros();
+			cerrarCrearLibro();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+
+}
+
+function eliminarLibro(idLibro) {
+	if (!confirm("Confirma si quieres eliminarlo")) {
+		return;
+	}
+	fetch("http://localhost:9999/libro/eliminar?id=" + idLibro, { method: 'DELETE' })
+		.then(res => res.text())
+		.then(res => {
+			buscarLibros();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		})
+}
+
+function cargaInicial() {
+	let selectGeneroFiltro = document.getElementById("generoFiltro");
+
+	fetch("http://localhost:9999/genero/buscarTodos")
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectGeneroFiltro.add(opt);
+			posts.forEach(genero => {
+				opt = document.createElement("option");
+				opt.value = genero.id;
+				opt.text = genero.nombre;
+				selectGeneroFiltro.add(opt);
+			});
+		})
+}

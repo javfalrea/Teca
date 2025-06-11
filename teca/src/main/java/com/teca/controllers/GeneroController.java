@@ -70,9 +70,36 @@ public class GeneroController {
 	}
 	
 	@GetMapping("/buscarPorNombre")
-	public ResponseEntity<?> buscarPorNombre(@RequestParam String nombre) {
+	public ResponseEntity<?> buscarPorNombre(@RequestParam(required=false) String nombre) {
 		try {
 			return ResponseEntity.ok().body(s.buscarPorNombre(nombre)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarPorPelicula")
+	public ResponseEntity<?> buscarPorPelicula(@RequestParam Long idPelicula) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorPelicula(idPelicula)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarPorSerie")
+	public ResponseEntity<?> buscarPorSerie(@RequestParam Long idSerie) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorSerie(idSerie)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarPorLibro")
+	public ResponseEntity<?> buscarPorLibro(@RequestParam Long idLibro) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorLibro(idLibro)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}

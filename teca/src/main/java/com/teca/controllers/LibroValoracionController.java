@@ -24,13 +24,11 @@ public class LibroValoracionController {
 	
 	@PostMapping("/crear")
 	public ResponseEntity<?> crear(@RequestParam Long idLibro,
-			@RequestParam Long idUsuario,
-			@RequestParam Boolean vista,
 			@RequestParam Double valoracion,
 			@RequestParam Boolean fav,
 			@RequestParam String critica) {
 		try {
-			return ResponseEntity.ok().body(s.crear(idLibro, idUsuario, vista, valoracion, fav, critica)); 
+			return ResponseEntity.ok().body(s.crear(idLibro, valoracion, fav, critica)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
@@ -38,34 +36,30 @@ public class LibroValoracionController {
 	
 	@PutMapping("/modificar")
 	public ResponseEntity<?> modificar(@RequestParam Long idLibro,
-			@RequestParam Long idUsuario,
-			@RequestParam Boolean vista,
 			@RequestParam Double valoracion,
 			@RequestParam Boolean fav,
 			@RequestParam String critica) {
 		try {
-			return ResponseEntity.ok().body(s.modificar(idLibro, idUsuario, vista, valoracion, fav, critica)); 
+			return ResponseEntity.ok().body(s.modificar(idLibro, valoracion, fav, critica)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 	
 	@DeleteMapping("/eliminar")
-	public ResponseEntity<?> eliminar(@RequestParam Long idLibro, 
-			@RequestParam Long idUsuario) {
+	public ResponseEntity<?> eliminar(@RequestParam Long idLibro) {
 		try {
-			s.eliminar(idLibro, idUsuario);
+			s.eliminar(idLibro);
 			return ResponseEntity.ok().body("Eliminación correcta"); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 	
-	@GetMapping("/buscarPorLibroYUsuario")
-	public ResponseEntity<?> buscarPorLibroYUsuario(@RequestParam Long idLibro,
-			@RequestParam Long idUsuario) {
+	@GetMapping("/buscarPorId")
+	public ResponseEntity<?> buscarPorId(@RequestParam Long idLibro) {
 		try {
-			return ResponseEntity.ok().body(s.buscarPorLibroYUsuario(idLibro, idUsuario)); 
+			return ResponseEntity.ok().body(s.buscarPorId(idLibro)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}

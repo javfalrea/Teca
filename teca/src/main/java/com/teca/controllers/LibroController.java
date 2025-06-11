@@ -62,9 +62,9 @@ public class LibroController {
 	}
 	
 	@GetMapping("/buscarTodos")
-	public ResponseEntity<?> buscarTodo() {
+	public ResponseEntity<?> buscarTodos() {
 		try {
-			return ResponseEntity.ok().body(s.buscarTodo()); 
+			return ResponseEntity.ok().body(s.buscarTodos()); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
@@ -85,6 +85,15 @@ public class LibroController {
 			@RequestParam(required = false) Long idGenero) {
 		try {
 			return ResponseEntity.ok().body(s.busquedaAvanzada(titulo, autor, idGenero)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarPorAutor")
+	public ResponseEntity<?> buscarPorAutor(@RequestParam Long idParticipante) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorAutor(idParticipante)); 
 		} catch (SQLException e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}

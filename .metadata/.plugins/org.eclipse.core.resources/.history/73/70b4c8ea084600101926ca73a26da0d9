@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Detalle de Película</title>
+	<link rel="stylesheet" href="detalles.css">
+</head>
+
+<body onload="cargarDetallePelicula(); cargaInicial();">
+
+	<div class="paginas">
+		<button onclick="location.href='/html/pelicula.html'">Volver</button>
+	</div>
+	<div id="detallePelicula">
+		<h1><span id="titulo"></span></h1>
+		<p class="info">
+		<p>Titulo Original <span id="tituloOriginal"></span></p>
+		<p>Año </strong> <span id="anio"></span></p>
+		<p>País
+		<div id="bandera"></div><span id="pais"></span></p>
+		<p>Duración <span id="duracion"></span> min</p>
+		<p>Dirección </p>
+		<ul id="director"></ul>
+		<p>Reparto </p>
+		<ul id="actor"></ul>
+		<p>Género </p>
+		<ul id="genero"></ul>
+		<p>Sinopsis <span id="sinopsis"></span></p>
+		<p>Critica </p><span id="critica"></span></p>
+	</div>
+	<div class="imagenYValoracion">
+		<div id="imagen"></div>
+		<div id="valorar">
+			<button id="botonGestionarValoracion" onclick="abrirGestionarValoracion()">Valorar</button>
+			<div id="valoracion"></div>
+			<div id="corazon"></div>
+		</div>
+	</div>
+	<div id="funcionalidades">
+		<button id="botonAgregarGenero" onclick="abrirAgregarGenero()">Agregar género</button>
+		<button id="botonAgregarParticipante" onclick="abrirAgregarParticipante()">Agregar participante</button>
+	</div>
+	
+	<div id="modalValoracion" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Crear Valoración</h2>
+			<label for="valoracionM">Valoración</label>
+			<input type="number" name="valoracionM" id="valoracionM"></input>
+			<label for="favM">¿Recomendada?</label>
+			<input type="checkbox" name="favM" id="favM"></input>
+			<label for="criticaM">Crítica</label>
+			<input type="text" name="criticaM" id="criticaM">
+
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarValoracion()">Aceptar</button>
+				<button onclick="cerrarCrearValoracion()">Cancelar</button>
+			</div>
+			
+			<input type="hidden" id="idPelicula">
+
+
+		</div>
+	</div>
+	<div id="modalAgregarParticipante" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Agregar participante</h2>
+			<label for="participante">Participante</label>
+			<select name="participante" id="participante"></select>
+			<label for="esActor">Actor</label>
+			<input type="checkbox" name="esActor" id="esActor"></input>
+			<label for="esDirector">Director</label>
+			<input type="checkbox" name="esDirector" id="esDirector">
+			
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarAgregarParticipante()">Aceptar</button>
+				<button onclick="cerrarAgregarParticipante()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idParticipante">
+		</div>
+	</div>
+	
+	<div id="modalAgregarGenero" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Agregar género</h2>
+			<label for="generoM">Género</label>
+			<select name="generoM" id="generoM"></select>
+			
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarAgregarGenero()">Aceptar</button>
+				<button onclick="cerrarAgregarGenero()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idGenero">
+		</div>
+	</div>
+
+	<script src="/js/detallePelicula.js"></script>
+
+</body>
+
+</html>

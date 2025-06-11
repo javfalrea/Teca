@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Detalle de Libro</title>
+	<link rel="stylesheet" href="../css/detalles.css">
+</head>
+
+<body onload="cargarDetalleLibro(); cargaInicial();">
+
+	<div class="paginas">
+		<button onclick="location.href='/html/libro.html'">Volver</button>
+	</div>
+	<div id="detalle">
+		<h1><span id="titulo"></span></h1>
+		<p class="info">
+		<p>Titulo original <span id="tituloOriginal"></span></p>
+		<p>Año <span id="anio"></span></p>
+		<p>Páginas aproximadas <span id="paginasAprox"></span></p>
+		<p>Autor</p>
+		<ul id="autor"></ul>
+		<p>Género</p>
+		<ul id="genero"></ul>
+		<p>Sinopsis <span id="sinopsis"></span></p>
+		<p>Critica <span id="critica"></span></p>
+	</div>
+	<div class="imagenYValoracion">
+		<div id="imagen"></div>
+		<div id="valorar">
+			<button id="botonGestionarValoracion" onclick="abrirGestionarValoracion()">Valorar</button>
+			<button id="botonModificarValoracion" onclick="abrirModificarValoracion()" style="display:none;">Modificar
+				valoración</button>
+			<div id="valoracion"></div>
+			<div id="corazon"></div>
+		</div>
+	</div>
+	<div class="funcionalidadesAgregar">
+		<button id="botonAgregarGenero" onclick="abrirAgregarGenero()">Agregar género</button>
+		<button id="botonAgregarParticipante" onclick="abrirAgregarParticipante()">Agregar participante</button>
+	</div>
+	<div class="modificar">
+		<button id="botonModificarLibro" onclick="abrirModificarLibro()">Modificar libro</button>
+	</div>
+
+	<div id="modalValoracion" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Crear Valoración</h2>
+			<label for="valoracionM">Valoración</label>
+			<input type="number" name="valoracionM" id="valoracionM"></input>
+			<label for="favM">Fav</label>
+			<input type="checkbox" name="favM" id="favM"></input>
+			<label for="criticaM">Crítica</label>
+			<input type="text" name="criticaM" id="criticaM">
+
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarValoracion()">Aceptar</button>
+				<button onclick="cerrarCrearValoracion()">Cancelar</button>
+			</div>
+
+			<input type="hidden" id="idPelicula">
+
+		</div>
+	</div>
+	<div id="modalAgregarParticipante" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Agregar participante</h2>
+			<label for="participante">Participante</label>
+			<select name="participante" id="participante"></select>
+
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarAgregarParticipante()">Aceptar</button>
+				<button onclick="cerrarAgregarParticipante()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idParticipante">
+		</div>
+	</div>
+
+	<div id="modalAgregarGenero" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Agregar género</h2>
+			<label for="generoM">Género</label>
+			<select name="generoM" id="generoM"></select>
+
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarAgregarGenero()">Aceptar</button>
+				<button onclick="cerrarAgregarGenero()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idGenero">
+		</div>
+	</div>
+	
+	<div id="modalLibro" class="modal" style="display: none;">
+		<div class="contenidoModal">
+			<h2 style="text-align: center;">Nuevo Libro</h2>
+			<label for="tituloMP">Título</label>
+			<input type="text" name="tituloMP" id="tituloMP">
+			<label for="tituloOriginalMP">Título Original</label>
+			<input type="text" name="tituloOriginalMP" id="tituloOriginalMP">
+			<label for="anioMP">Año de lanzamiento</label>
+			<input type="number" name="anioMP" id="anioMP">
+			<label for="paginasAproxMP">Páginas aproximadas</label>
+			<input type="number" name="paginasAproxMP" id="paginasAproxMP">
+			<label for="sinopsis">Sinopsis</label>
+			<textarea name="sinopsisMP" id="sinopsisMP"></textarea>
+			<label for="imagenMP">URL Imagen</label>
+			<input type="text" name="imagenMP" id="imagenMP">
+	
+			<div style="display: flex; justify-content: space-around;">
+				<button onclick="modificarLibro()">Aceptar</button>
+				<button onclick="cerrarCrearLibro()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idLibro">
+	
+		</div>
+	</div>
+	
+	<script src="/js/detalleLibro.js"></script>
+	
+	</body>
+
+</html>

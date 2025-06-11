@@ -88,7 +88,7 @@ public class LibroService {
 		conn.close();
 	}
 	
-	public List<Libro> buscarTodo() throws SQLException {
+	public List<Libro> buscarTodos() throws SQLException {
 		Connection conn = General.conexion();
 		
 		String selectLibro = "SELECT * FROM libro";
@@ -167,6 +167,36 @@ public class LibroService {
 	    ps.setString(5, "%" + autor.toLowerCase() + "%");
 	    ps.setLong(6, idGenero);
 	    ps.setLong(7, idGenero);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Libro> libros = new ArrayList<Libro>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String titulo = rs.getString("titulo");
+			String tituloOriginal = rs.getString("titulo_original");
+			Integer anioLanzamiento = rs.getInt("anio_lanzamiento");
+			Integer paginasAprox = rs.getInt("paginas_aprox");
+			String sinopsis = rs.getString("sinopsis");
+			String imagen = rs.getString("imagen");
+			
+			Libro libro = new Libro(id, titulo, tituloOriginal, anioLanzamiento, paginasAprox, sinopsis, imagen);
+			libros.add(libro);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return libros;
+	}
+	
+	public List<Libro> buscarPorAutor(Long idParticipante) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectLibro = "SELECT * FROM libro l JOIN libro_participante lp ON l.id = lp.id_libro JOIN participante p ON lp.id_participante = p.id WHERE p.id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectLibro);
+		ps.setLong(1, idParticipante);
 		
 		ResultSet rs = ps.executeQuery();
 		List<Libro> libros = new ArrayList<Libro>();

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Películas</title>
+    <link rel="stylesheet" href="css/tablas.css">
+</head>
+<body onLoad="cargaInicial()">
+	
+	<div class="paginas">
+	    <button onclick="location.href='index.html'">Volver</button>
+	</div>
+
+    <h1>Películas</h1>
+
+    <div class="filtros">
+        <input type="text" id="tituloFiltro" placeholder="Película">
+        <input type="text" id="participanteFiltro" placeholder="Participante">
+        <select id="generoFiltro"></select>
+        <button id="botonBuscarPeliculas" onclick="buscarPeliculas()">Buscar</button>
+        <button id="botonCrearPelicula" onclick="abrirCrearPelicula()">Insertar Película</button>
+    </div>
+
+    <table id="tablaPeliculas">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Año de estreno</th>
+                <th>País</th>
+				<th>Dirección</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="contenidoTabla"></tbody>
+    </table>
+
+    <div id="modalPelicula" class="modal" style="display: none;">
+        <div class="contenidoModal">
+            <h2 style="text-align: center;">Nueva película</h2>
+            <label for="titulo">Título</label>
+            <input type="text" name="titulo" id="titulo">
+			<label for="tituloOriginal">Título Original</label>
+			<input type="text" name="tituloOriginal" id="tituloOriginal">
+            <label for="anioEstreno">Año de estreno</label>
+            <input type="number" name="anioEstreno" id="anioEstreno">
+            <label for="pais">País</label>
+            <select name="pais" id="pais"></select>
+            <label for="duracion">Duración</label>
+            <input type="number" name="duracion" id="duracion">
+            <label for="sinopsis">Sinopsis</label>
+            <textarea name="sinopsis" id="sinopsis"></textarea>
+			<label for="imagen">URL Imagen</label>
+			<input type="text" name="imagen" id="imagen">
+
+            <div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarPelicula()">Aceptar</button>
+				<button onclick="cerrarCrearPelicula()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idPelicula">
+           
+        </div>
+    </div>
+
+    <script src="/js/pelicula.js"></script>
+</body>
+</html>

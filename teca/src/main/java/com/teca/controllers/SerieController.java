@@ -89,5 +89,23 @@ public class SerieController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
+	
+	@GetMapping("/buscarPorDirector")
+	public ResponseEntity<?> buscarPorDirector(@RequestParam Long idParticipante) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorDirector(idParticipante)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+	
+	@GetMapping("/buscarPorActor")
+	public ResponseEntity<?> buscarPorActor(@RequestParam Long idParticipante) {
+		try {
+			return ResponseEntity.ok().body(s.buscarPorActor(idParticipante)); 
+		} catch (SQLException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
 
 }

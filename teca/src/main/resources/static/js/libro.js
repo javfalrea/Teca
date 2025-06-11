@@ -1,0 +1,127 @@
+function buscarLibros() {
+	var titulo = encodeURIComponent(document.getElementById("tituloFiltro").value.trim());
+	var autor = encodeURIComponent(document.getElementById("participanteFiltro").value.trim());
+	var generoStr = document.getElementById("generoFiltro").value;
+	var genero = parseInt(generoStr);
+	if (isNaN(genero)) {
+		genero = 0;
+	}
+
+	fetch("http://localhost:9999/libro/busquedaAvanzada?titulo=" + titulo + "&autor=" + autor + "&idGenero=" + genero)
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let filasTabla = [];
+
+			const promesas = posts.map(fila => {
+				return fetch("http://localhost:9999/participante/buscarPorLibro?id=" + encodeURIComponent(fila.id))
+					.then(res => res.text())
+					.then(jsonAut => {
+						const autores = JSON.parse(jsonAut);
+						let autorTexto = "ND";
+						if (autores && autores.length > 0) {
+							autorTexto = autores.map(a => a.nombre).join(", ");
+						}
+
+						let filaHTML = "<tr>";
+						filaHTML += "<td>" + fila.titulo + "</td>";
+						filaHTML += "<td>" + fila.anioLanzamiento + "</td>";
+						filaHTML += "<td>" + autorTexto + "</td>";
+						filaHTML += "<td><button onclick=\"eliminarLibro('" + fila.id + "')\">Eliminar</button><button onclick=\"verDetallesLibro('" + fila.id + "')\">Detalles</button></td>";
+						filaHTML += "</tr>";
+
+						filasTabla.push(filaHTML);
+					});
+			});
+
+			Promise.all(promesas).then(() => {
+				var contenidoTabla = document.getElementById("contenidoTabla");
+				contenidoTabla.innerHTML = filasTabla.join("");
+			});
+		})
+		.catch(e => {
+			console.log('Error importando archivo: ' + e.message);
+		});
+}
+
+function verDetallesLibro(idLibro) {
+	window.location.href = `detalleLibro.html?id=${encodeURIComponent(idLibro)}`;
+}
+
+function abrirCrearLibro() {
+	var modal = document.getElementById("modalLibro");
+	modal.style.display = "block";
+}
+
+function cerrarCrearLibro() {
+	document.getElementById("idLibro").value = "";
+	document.getElementById("titulo").value = "";
+	document.getElementById("tituloOriginal").value = "";
+	document.getElementById("anioLanzamiento").value = "";
+	document.getElementById("paginasAprox").value = "";
+	document.getElementById("sinopsis").value = "";
+	document.getElementById("imagen").value = "";
+
+	var modal = document.getElementById("modalLibro");
+	modal.style.display = "none";
+}
+
+function gestionarLibro() {
+	var titulo = encodeURIComponent(document.getElementById("titulo").value);
+	var tituloOriginal = encodeURIComponent(document.getElementById("tituloOriginal").value);
+	var anioLanzamiento = encodeURIComponent(document.getElementById("anioLanzamiento").value);
+	var paginasAprox = encodeURIComponent(document.getElementById("paginasAprox").value);
+	var sinopsis = encodeURIComponent(document.getElementById("sinopsis").value);
+	var imagen = encodeURIComponent(document.getElementById("imagen").value);
+
+	var url = "http://localhost:9999/libro/crear?titulo=" + titulo +
+		"&tituloOriginal=" + tituloOriginal +
+		"&anioLanzamiento=" + anioLanzamiento +
+		"&paginasAprox=" + paginasAprox +
+		"&sinopsis=" + sinopsis +
+		"&imagen=" + imagen;
+
+	fetch(url, { method: 'POST' })
+		.then(res => res.text())
+		.then(res => {
+			buscarLibros();
+			cerrarCrearLibro();
+		})
+		.catch(e => {
+			console.log('Error importando archivo: ' + e.message);
+		});
+}
+
+function eliminarLibro(idLibro) {
+	if (!confirm("Confirma si quieres eliminarlo")) {
+		return;
+	}
+	fetch("http://localhost:9999/libro/eliminar?id=" + encodeURIComponent(idLibro), { method: 'DELETE' })
+		.then(res => res.text())
+		.then(res => {
+			buscarLibros();
+		})
+		.catch(e => {
+			console.log('Error importando archivo: ' + e.message);
+		});
+}
+
+function cargaInicial() {
+	let selectGeneroFiltro = document.getElementById("generoFiltro");
+
+	fetch("http://localhost:9999/genero/buscarTodos")
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectGeneroFiltro.add(opt);
+			posts.forEach(genero => {
+				opt = document.createElement("option");
+				opt.value = genero.id;
+				opt.text = genero.nombre;
+				selectGeneroFiltro.add(opt);
+			});
+		});
+}

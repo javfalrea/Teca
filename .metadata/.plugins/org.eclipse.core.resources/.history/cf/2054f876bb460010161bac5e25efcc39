@@ -1,0 +1,201 @@
+function getIdParticipanteDesdeUrl() {
+	const params = new URLSearchParams(window.location.search);
+	return params.get('id');
+}
+
+function cargarDetalleParticipante() {
+	document.getElementById("peliculaDirector").innerHTML = "";
+	document.getElementById("peliculaActor").innerHTML = "";
+	document.getElementById("serieActor").innerHTML = "";
+	document.getElementById("serieDirector").innerHTML = "";
+	document.getElementById("libro").innerHTML = "";
+
+	const id = getIdParticipanteDesdeUrl();
+
+	fetch(`http://localhost:9999/participante/buscarPorId?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(p => {
+			document.getElementById("nombre").textContent = p.nombre;
+			document.getElementById("fechaNacimiento").textContent = p.fechaNacimiento;
+			document.getElementById("fechaFallecimiento").textContent = p.fechaFallecimiento;
+			if (p.fechaFallecimiento == null) {
+				document.getElementById("fallecido").style.display = "none";
+			} else {
+				document.getElementById("fallecido").style.display = "block";
+			}
+			document.getElementById("bandera").innerHTML = "<img title='" + p.pais.nombre + "' src='" + p.pais.bandera + "' style='width:16px; height:auto; display:block; margin:auto;'>";
+			document.getElementById("pais").textContent = p.pais.nombre;
+			document.getElementById("imagen").innerHTML = "<img title='" + p.titulo + "' src='" + p.imagen + "'>";
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/pelicula/buscarPorDirector?idParticipante=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(p => {
+			if(p.length > 0) {
+				document.getElementById("directorP").style.display = "block";
+			}
+			for (let i = 0; i < p.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${p[i].titulo} 
+					<button onclick="verDetallesPelicula('${p[i].id}')" class="botonPart">Detalles</button>
+				`;
+				document.getElementById("peliculaDirector").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/pelicula/buscarPorActor?idParticipante=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(p => {
+			if(p.length > 0) {
+				document.getElementById("actorP").style.display = "block";
+			}
+			for (let i = 0; i < p.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${p[i].titulo} 
+				  	<button onclick="verDetallesPelicula('${p[i].id}')" class="botonPart">Detalles</button>
+				`;
+				document.getElementById("peliculaActor").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/serie/buscarPorDirector?idParticipante=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(s => {
+			if(s.length > 0) {
+				document.getElementById("directorS").style.display = "block";
+			}
+			for (let i = 0; i < s.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${s[i].titulo} 
+					<button onclick="verDetallesSerie('${s[i].id}')" class="botonPart">Detalles</button>
+				`;
+				document.getElementById("serieDirector").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/serie/buscarPorActor?idParticipante=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(s => {
+			if (s.length > 0) {
+				document.getElementById("actorS").style.display = "block";
+			}
+			for (let i = 0; i < s.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${s[i].titulo} 
+					<button onclick="verDetallesSerie('${s[i].id}')" class="botonPart">Detalles</button>
+				`;
+				document.getElementById("serieActor").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/libro/buscarPorAutor?idParticipante=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(l => {
+			if (l.length > 0) {
+				document.getElementById("escritor").style.display = "block";
+			}
+			for (let i = 0; i < l.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${l[i].titulo} 
+					<button onclick="verDetallesLibro('${l[i].id}')" class="botonPart">Detalles</button>
+				`;
+				document.getElementById("libro").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));	
+}
+
+function verDetallesPelicula(idPelicula) {
+	window.location.href = `detallePelicula.html?id=${encodeURI(idPelicula)}`;
+}
+
+function verDetallesSerie(idSerie) {
+	window.location.href = `detalleSerie.html?id=${encodeURI(idSerie)}`;
+}
+
+function verDetallesLibro(idLibro) {
+	window.location.href = `detalleLibro.html?id=${encodeURI(idLibro)}`;
+}
+
+function cargaInicial() {
+	let selectPais = document.getElementById("paisP");
+
+	fetch("http://localhost:9999/pais/buscarTodos")
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectPais.add(opt);
+			posts.forEach(pais => {
+				opt = document.createElement("option");
+				opt.value = pais.id;
+				opt.text = pais.nombre;
+				selectPais.add(opt);
+			});
+		})
+}
+
+function abrirModificarParticipante() {
+	var id = getIdParticipanteDesdeUrl();
+	fetch(`http://localhost:9999/participante/buscarPorId?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(p => {
+			document.getElementById("nombreP").value = p.nombre;
+			document.getElementById("fechaNacimientoP").value = p.fechaNacimiento;
+			document.getElementById("fechaFallecimientoP").value = p.fechaFallecimiento;
+			document.getElementById("imagenP").value = p.imagen;
+			document.getElementById("paisP").value = p.pais.id;
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	var modal = document.getElementById("modalParticipante");
+	modal.style.display = "block";
+}
+
+function cerrarCrearParticipante() {	
+	var modal = document.getElementById("modalParticipante");
+	modal.style.display = "none";	
+} 
+
+function modificarParticipante() {
+	var id = getIdParticipanteDesdeUrl();
+	var nombre = document.getElementById("nombreP").value;
+	var fechaNacimiento = document.getElementById("fechaNacimientoP").value;
+	var fechaFallecimiento = document.getElementById("fechaFallecimientoP").value;
+	var pais = document.getElementById("paisP").value;
+	var imagen = document.getElementById("imagenP").value;
+
+	let url = `http://localhost:9999/participante/modificar?id=${encodeURIComponent(id)}&nombre=${encodeURIComponent(nombre)}&fechaNacimiento=${encodeURIComponent(fechaNacimiento)}`;
+	if (fechaFallecimiento) {
+		url += `&fechaFallecimiento=${encodeURIComponent(fechaFallecimiento)}`;
+	}
+	url += `&imagen=${encodeURIComponent(imagen)}&idPais=${encodeURIComponent(pais)}`;
+
+	fetch(url, { method: 'PUT' })
+		.then(res => {
+			if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+			return res.text();
+		})
+		.then(res => {
+			cargarDetalleParticipante();
+			cerrarCrearParticipante();
+		})
+		.catch(e => {
+			console.log('Error al modificar participante: ' + e.message);
+		});
+}
+
+	
+}

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.teca.entities.Serie;
 import com.teca.entities.SerieValoracion;
-import com.teca.entities.Usuario;
 import com.teca.util.General;
 
 @Service
@@ -20,22 +19,17 @@ public class SerieValoracionService {
 	@Autowired
 	private SerieService s;
 
-	@Autowired
-	private UsuarioService u;
-
-	public SerieValoracion crear(Long idSerie, Long idUsuario, Boolean vista, Double valoracion, Boolean fav, String critica) throws SQLException {
+	public SerieValoracion crear(Long idSerie, Double valoracion, Boolean fav, String critica) throws SQLException {
 
 		Connection conn = General.conexion();
 
-		String insertValoracion = "INSERT INTO serie_valoracion (id_serie, id_usuario, vista, valoracion, fav, critica) VALUES (?, ?, ?, ?, ?, ?)";
+		String insertValoracion = "INSERT INTO serie_valoracion (id_serie, valoracion, fav, critica) VALUES (?, ?, ?, ?)";
 
 		PreparedStatement ps = conn.prepareStatement(insertValoracion, Statement.RETURN_GENERATED_KEYS);
 		ps.setLong(1, idSerie);
-		ps.setLong(2, idUsuario);
-		ps.setBoolean(3, vista);
-		ps.setDouble(4, valoracion);
-		ps.setBoolean(5, fav);
-		ps.setString(6, critica);
+		ps.setDouble(2, valoracion);
+		ps.setBoolean(3, fav);
+		ps.setString(4, critica);
 
 		int respuesta = ps.executeUpdate();
 		if (respuesta != 1) {
@@ -44,9 +38,7 @@ public class SerieValoracionService {
 
 		Serie serie = s.buscarPorId(idSerie);
 
-		Usuario usuario = u.buscarPorId(idUsuario);
-
-		SerieValoracion serieValoracion = new SerieValoracion(serie, usuario, vista, valoracion, fav, critica);
+		SerieValoracion serieValoracion = new SerieValoracion(serie, valoracion, fav, critica);
 
 		ps.close();
 		conn.close();
@@ -54,18 +46,16 @@ public class SerieValoracionService {
 		return serieValoracion;
 	}
 
-	public SerieValoracion modificar(Long idSerie, Long idUsuario, Boolean vista, Double valoracion, Boolean fav, String critica) throws SQLException {
+	public SerieValoracion modificar(Long idSerie, Double valoracion, Boolean fav, String critica) throws SQLException {
 		Connection conn = General.conexion();
 
-		String updateValoracion = "UPDATE serie_valoracion SET vista = ?, valoracion = ?, fav = ?, critica = ? WHERE id_serie = ? AND id_usuario = ?";
+		String updateValoracion = "UPDATE serie_valoracion SET valoracion = ?, fav = ?, critica = ? WHERE id_serie = ?";
 
 		PreparedStatement ps = conn.prepareStatement(updateValoracion);
-		ps.setBoolean(1, vista);
-		ps.setDouble(2, valoracion);
-		ps.setBoolean(3, fav);
-		ps.setString(4, critica);
-		ps.setLong(5, idSerie);
-		ps.setLong(6, idUsuario);
+		ps.setDouble(1, valoracion);
+		ps.setBoolean(2, fav);
+		ps.setString(3, critica);
+		ps.setLong(4, idSerie);
 
 		int respuesta = ps.executeUpdate();
 		if (respuesta != 1) {
@@ -74,9 +64,7 @@ public class SerieValoracionService {
 
 		Serie serie = s.buscarPorId(idSerie);
 
-		Usuario usuario = u.buscarPorId(idUsuario);
-
-		SerieValoracion serieValoracion = new SerieValoracion(serie, usuario, vista, valoracion, fav, critica);
+		SerieValoracion serieValoracion = new SerieValoracion(serie, valoracion, fav, critica);
 
 		ps.close();
 		conn.close();
@@ -84,14 +72,13 @@ public class SerieValoracionService {
 		return serieValoracion;
 	}
 
-	public void eliminar(Long idSerie, Long idUsuario) throws SQLException {
+	public void eliminar(Long idSerie) throws SQLException {
 		Connection conn = General.conexion();
 
-		String deleteValoracion = "DELETE FROM serie_valoracion WHERE id_serie = ? AND id_usuario = ?";
+		String deleteValoracion = "DELETE FROM serie_valoracion WHERE id_serie = ?";
 
 		PreparedStatement ps = conn.prepareStatement(deleteValoracion);
 		ps.setLong(1, idSerie);
-		ps.setLong(2, idUsuario);
 
 		int respuesta = ps.executeUpdate();
 		if (respuesta != 1) {
@@ -101,33 +88,37 @@ public class SerieValoracionService {
 		ps.close();
 		conn.close();
 	}
-
-	public SerieValoracion buscarPorSerieYUsuario(Long idSerie, Long idUsuario) throws SQLException {
+	
+	public SerieValoracion buscarPorId(Long idSerie) throws SQLException {
 		Connection conn = General.conexion();
 
-		String selectValoracion = "SELECT * FROM serie_valoracion WHERE id_serie = ? AND id_usuario = ?";
+		String selectValoracion = "SELECT * FROM serie_valoracion WHERE id_serie = ?";
 
 		PreparedStatement ps = conn.prepareStatement(selectValoracion);
 		ps.setLong(1, idSerie);
-		ps.setLong(2, idUsuario);
-
+		
 		ResultSet rs = ps.executeQuery();
-		rs.next();
-		Boolean vista = rs.getBoolean("vista");
-		Double valoracion = rs.getDouble("valoracion");
-		Boolean fav = rs.getBoolean("fav");
-		String critica = rs.getString("critica");
-
-		Serie serie = s.buscarPorId(idSerie);
-
-		Usuario usuario = u.buscarPorId(idUsuario);
-
-		SerieValoracion serieValoracion = new SerieValoracion(serie, usuario, vista, valoracion, fav, critica);
-
-		ps.close();
-		conn.close();
-
-		return serieValoracion;
+	    if (rs.next()) {
+	        Double valoracion = rs.getDouble("valoracion");
+	        Boolean fav = rs.getBoolean("fav");
+	        String critica = rs.getString("critica");
+	        
+	        Serie serie = s.buscarPorId(idSerie);
+	        
+	        SerieValoracion serieValoracion = new SerieValoracion(serie, valoracion, fav, critica);
+	        
+	        rs.close();
+	        ps.close();
+	        conn.close();
+	        
+	        return serieValoracion;
+	    } else {
+	        rs.close();
+	        ps.close();
+	        conn.close();
+	        
+	        return null;
+	    }
 	}
 
 }

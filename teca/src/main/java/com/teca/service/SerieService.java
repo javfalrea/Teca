@@ -202,4 +202,68 @@ public class SerieService {
 		return series;
 	}
 	
+	public List<Serie> buscarPorDirector(Long idParticipante) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectSerie = "SELECT * FROM serie s JOIN serie_participante sp ON s.id = sp.id_serie JOIN participante p ON sp.id_participante = p.id WHERE p.id = ? AND sp.es_director = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectSerie);
+		ps.setLong(1, idParticipante);
+		ps.setBoolean(2, true);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Serie> series = new ArrayList<Serie>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String titulo = rs.getString("titulo");
+			String tituloOriginal = rs.getString("titulo_original");
+			Boolean terminada = rs.getBoolean("terminada");
+			String sinopsis = rs.getString("sinopsis");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = p.buscarPorSerie(id);
+			
+			Serie serie = new Serie(id, titulo, tituloOriginal, terminada, sinopsis, imagen, pais);
+			series.add(serie);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return series;
+	}
+	
+	public List<Serie> buscarPorActor(Long idParticipante) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectSerie = "SELECT * FROM serie s JOIN serie_participante sp ON s.id = sp.id_serie JOIN participante p ON sp.id_participante = p.id WHERE p.id = ? AND sp.es_actor = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectSerie);
+		ps.setLong(1, idParticipante);
+		ps.setBoolean(2, true);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Serie> series = new ArrayList<Serie>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String titulo = rs.getString("titulo");
+			String tituloOriginal = rs.getString("titulo_original");
+			Boolean terminada = rs.getBoolean("terminada");
+			String sinopsis = rs.getString("sinopsis");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = p.buscarPorSerie(id);
+			
+			Serie serie = new Serie(id, titulo, tituloOriginal, terminada, sinopsis, imagen, pais);
+			series.add(serie);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return series;
+	}
+	
 }

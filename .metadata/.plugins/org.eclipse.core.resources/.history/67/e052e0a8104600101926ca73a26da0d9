@@ -1,0 +1,351 @@
+let valorada = false;
+
+function getIdPeliculaDesdeUrl() {
+	const params = new URLSearchParams(window.location.search);
+	return params.get('id');
+}
+
+function cargarDetallePelicula() {
+	document.getElementById("director").innerHTML = "";
+	document.getElementById("actor").innerHTML = "";
+	document.getElementById("genero").innerHTML = "";
+
+	const id = getIdPeliculaDesdeUrl();
+
+	fetch(`http://localhost:9999/pelicula/buscarPorId?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(p => {
+			document.getElementById("titulo").textContent = p.titulo;
+			document.getElementById("tituloOriginal").textContent = p.tituloOriginal;
+			document.getElementById("anio").textContent = p.anioEstreno;
+			document.getElementById("bandera").innerHTML = "<img title='" + p.pais.nombre + "' src='" + p.pais.bandera + "' style='width:16px; height:auto; display:block; margin:auto;'>";
+			document.getElementById("pais").textContent = p.pais.nombre;
+			document.getElementById("duracion").textContent = p.duracion;
+			document.getElementById("sinopsis").textContent = p.sinopsis;
+			document.getElementById("imagen").innerHTML = "<img title='" + p.titulo + "' src='" + p.imagen + "'>";
+			
+			document.getElementById("tituloMP").textContent = p.titulo;
+			document.getElementById("tituloOriginalMP").textContent = p.tituloOriginal;
+			document.getElementById("anioMP").textContent = p.anioEstreno;
+			document.getElementById("paisMP").textContent = p.pais.id;
+			document.getElementById("duracionMP").textContent = p.duracion;
+			document.getElementById("sinopsisMP").textContent = p.sinopsis;
+			document.getElementById("imagenMP").textContent = p.imagen;
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/genero/buscarPorPelicula?idPelicula=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(g => {
+			for (let i = 0; i < g.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${g[i].nombre} 
+					<button onclick="eliminarGenero('${g[i].id}')" class="botonPart">Eliminar</button>
+				`;
+				document.getElementById("genero").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/participante/buscarDirectorPorPelicula?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(d => {
+			for (let i = 0; i < d.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${d[i].nombre} 
+					<button onclick="verDetallesParticipante('${d[i].id}')" class="botonPart">Detalles</button>
+					<button onclick="eliminarParticipante('${d[i].id}')" class="botonPart">Eliminar</button>
+				`;
+				document.getElementById("director").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/participante/buscarActorPorPelicula?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(a => {
+			for (let i = 0; i < a.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${a[i].nombre} 
+				  	<button onclick="verDetallesParticipante('${a[i].id}')" class="botonPart">Detalles</button>
+				  	<button onclick="eliminarParticipante('${a[i].id}')" class="botonPart">Eliminar</button>
+				`;
+				document.getElementById("actor").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	// Cargar valoración
+	fetch(`http://localhost:9999/peliculaValoracion/buscarPorId?idPelicula=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(vp => {
+			valorada = true;
+			document.getElementById("botonGestionarValoracion").style.display = "none";
+			document.getElementById("botonModificarValoracion").style.display = "block";
+
+			document.getElementById("valoracion").textContent = vp.valoracion;
+			if (vp.fav) {
+				document.getElementById("corazon").innerHTML = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Heart_coraz%C3%B3n.svg/800px-Heart_coraz%C3%B3n.svg.png' style='width:20px; height:auto;' alt='Recomendada'>";
+			} else {
+				document.getElementById("corazon").innerHTML = "";
+			}
+			document.getElementById("critica").textContent = vp.critica;
+		})
+		.catch(e => {
+			valorada = false;
+			document.getElementById("botonGestionarValoracion").style.display = "block";
+			document.getElementById("botonModificarValoracion").style.display = "none";
+
+			// Limpiar campos de valoración cuando no existe
+			document.getElementById("valoracion").textContent = "";
+			document.getElementById("corazon").innerHTML = "";
+			document.getElementById("critica").textContent = "";
+
+			console.log("Error: " + e.message);
+		});
+}
+
+function abrirGestionarValoracion() {
+	var modal = document.getElementById("modalValoracion");
+	modal.style.display = "block";
+}
+
+function cerrarCrearValoracion() {
+	document.getElementById("valoracionM").value = "";
+	document.getElementById("favM").checked = false;
+	document.getElementById("criticaM").value = "";
+
+	var modal = document.getElementById("modalValoracion");
+	modal.style.display = "none";
+}
+
+function gestionarValoracion() {
+	const id = getIdPeliculaDesdeUrl();
+	var valoracion = document.getElementById("valoracionM").value;
+	var fav = document.getElementById("favM").checked;
+	var critica = document.getElementById("criticaM").value;
+
+	var url = "";
+	var metodo;
+
+	if (valorada) {
+		url = "http://localhost:9999/peliculaValoracion/modificar?idPelicula=" + encodeURI(id) + "&valoracion=" + encodeURI(valoracion) + "&fav=" + encodeURI(fav) + "&critica=" + encodeURI(critica);
+		metodo = { method: 'PUT' };
+	} else {
+		url = "http://localhost:9999/peliculaValoracion/crear?idPelicula=" + encodeURI(id) + "&valoracion=" + encodeURI(valoracion) + "&fav=" + encodeURI(fav) + "&critica=" + encodeURI(critica);
+		metodo = { method: 'POST' };
+	}
+
+	fetch(url, metodo)
+		.then(res => res.text())
+		.then(res => {
+			cargarDetallePelicula();
+			cerrarCrearValoracion();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+
+}
+
+function abrirModificarValoracion() {
+	// Obtener los valores actuales de la valoración
+	const valoracionActual = document.getElementById("valoracion").textContent;
+	const favActual = document.getElementById("corazon").innerHTML !== "";
+	const criticaActual = document.getElementById("critica").textContent;
+
+	document.getElementById("idPelicula").value = getIdPeliculaDesdeUrl();
+	document.getElementById("valoracionM").value = valoracionActual;
+	document.getElementById("favM").checked = favActual;
+	document.getElementById("criticaM").value = criticaActual;
+
+	var modal = document.getElementById("modalValoracion");
+	modal.style.display = "block";
+}
+
+function verDetallesParticipante(idParticipante) {
+	window.location.href = `detalleParticipante.html?id=${encodeURI(idParticipante)}`;
+}
+
+function eliminarParticipante(idParticipante) {
+	const idPelicula = getIdPeliculaDesdeUrl();
+	if (!confirm("Confirma si quieres suprimir esta participación")) {
+		return;
+	}
+	fetch("http://localhost:9999/peliculaParticipante/desagregar?idPelicula=" + encodeURI(idPelicula) + "&idParticipante=" + encodeURI(idParticipante), { method: 'DELETE' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetallePelicula();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		})
+}
+
+function eliminarGenero(idGenero) {
+	const idPelicula = getIdPeliculaDesdeUrl();
+	if (!confirm("Confirma si quieres suprimir este género")) {
+		return;
+	}
+	fetch("http://localhost:9999/peliculaGenero/desagregar?idPelicula=" + encodeURI(idPelicula) + "&idGenero=" + encodeURI(idGenero), { method: 'DELETE' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetallePelicula();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		})
+}
+
+function abrirAgregarGenero() {
+	document.getElementById("idGenero").value = getIdPeliculaDesdeUrl();
+	var modal = document.getElementById("modalAgregarGenero");
+	modal.style.display = "block";
+}
+
+function cerrarAgregarGenero() {
+	document.getElementById("generoM").selectedIndex = 0;
+
+	var modal = document.getElementById("modalAgregarGenero");
+	modal.style.display = "none";
+}
+
+function gestionarAgregarGenero() {
+	var genero = document.getElementById("generoM").value;
+	var pelicula = getIdPeliculaDesdeUrl();
+
+	fetch("http://localhost:9999/peliculaGenero/agregar?idPelicula=" + encodeURI(pelicula) + "&idGenero=" + encodeURI(genero), { method: 'POST' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetallePelicula();
+			cerrarAgregarGenero();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+}
+
+function abrirAgregarParticipante() {
+	document.getElementById("idParticipante").value = getIdPeliculaDesdeUrl();
+	var modal = document.getElementById("modalAgregarParticipante");
+	modal.style.display = "block";
+}
+
+function cerrarAgregarParticipante() {
+	document.getElementById("participante").selectedIndex = 0;
+	document.getElementById("esActor").checked = false;
+	document.getElementById("esDirector").checked = false;
+
+	var modal = document.getElementById("modalAgregarParticipante");
+	modal.style.display = "none";
+}
+
+function gestionarAgregarParticipante() {
+	var idParticipante = document.getElementById("participante").value;
+	var pelicula = getIdPeliculaDesdeUrl();
+	var esActor = document.getElementById("esActor").checked;
+	var esDirector = document.getElementById("esDirector").checked;
+
+	fetch("http://localhost:9999/peliculaParticipante/agregar?idPelicula=" + encodeURI(pelicula) + "&idParticipante=" + encodeURI(idParticipante) + "&esActor=" + encodeURI(esActor) + "&esDirector=" + encodeURI(esDirector), { method: 'POST' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetallePelicula();
+			cerrarAgregarParticipante();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+}
+
+function cargaInicial() {
+	let selectParticipante = document.getElementById("participante");
+
+	fetch(`http://localhost:9999/participante/buscarTodos`)
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectParticipante.add(opt);
+			posts.forEach(participnate => {
+				opt = document.createElement("option");
+				opt.value = participnate.id;
+				opt.text = participnate.nombre;
+				selectParticipante.add(opt);
+			});
+		})
+
+	let selectGenero = document.getElementById("generoM");
+
+	fetch(`http://localhost:9999/genero/buscarTodos`)
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectGenero.add(opt);
+			posts.forEach(genero => {
+				opt = document.createElement("option");
+				opt.value = genero.id;
+				opt.text = genero.nombre;
+				selectGenero.add(opt);
+			});
+		})
+
+	let selectPais = document.getElementById("pais");
+
+	fetch("http://localhost:9999/pais/buscarTodos")
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectPais.appendChild(opt);
+			posts.forEach(pais => {
+				opt = document.createElement("option");
+				opt.value = pais.id;
+				opt.text = pais.nombre;
+				selectPais.appendChild(opt);
+			});
+		})
+}
+
+function abrirModificarPelicula() {
+	var modal = document.getElementById("modalPelicula");
+	modal.style.display = "block";	
+}
+
+function cerrarCrearPelicula() {	
+	var modal = document.getElementById("modalPelicula");
+	modal.style.display = "none";	
+} 
+
+function modificarPelicula() {
+	var idPelicula = getIdPeliculaDesdeUrl();
+	var titulo = document.getElementById("tituloMP").value;
+	var tituloOriginal = document.getElementById("tituloOriginalMP").value;
+	var anioEstreno = document.getElementById("anioEstrenoMP").value;
+	var pais = document.getElementById("paisMP").value;
+	var duracion = document.getElementById("duracionMP").value;
+	var sinopsis = document.getElementById("sinopsisMP").value;
+	var imagen = document.getElementById("imagenMP").value;
+	
+	var url = "http://localhost:9999/pelicula/modificar?idPelicula=" + idPelicula + "&titulo=" + titulo + "&tituloOriginal=" + tituloOriginal + "&anioEstreno=" + anioEstreno + "&idPais=" + pais + "&duracion=" + duracion + "&sinopsis=" + sinopsis + "&imagen=" + imagen;
+
+	fetch(url, { method:'PUT' })
+	.then(res => res.text())
+	.then(res => {
+		cargarDetallePelicula();
+		cerrarCrearPelicula();
+	})
+	.catch(e => {
+		console.log('Error importando archivo' + e.message);
+	});
+	
+}

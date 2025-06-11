@@ -184,5 +184,80 @@ public class GeneroService {
 		
 		return generos;
 	}	
+	
+	public List<Genero> buscarPorPelicula(Long idPelicula) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectGenero = "SELECT * FROM genero g JOIN pelicula_genero pg ON g.id = pg.id_genero JOIN pelicula p ON pg.id_pelicula = p.id WHERE p.id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectGenero);
+		ps.setLong(1,  idPelicula);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Genero> generos = new ArrayList<Genero>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			
+			Genero genero = new Genero(id, nombre);
+			generos.add(genero);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return generos;
+	}
+	
+	public List<Genero> buscarPorSerie(Long idSerie) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectGenero = "SELECT * FROM genero g JOIN serie_genero sg ON g.id = sg.id_genero JOIN serie s ON sg.id_serie = s.id WHERE s.id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectGenero);
+		ps.setLong(1,  idSerie);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Genero> generos = new ArrayList<Genero>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			
+			Genero genero = new Genero(id, nombre);
+			generos.add(genero);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return generos;
+	}
+	
+	public List<Genero> buscarPorLibro(Long idLibro) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectGenero = "SELECT * FROM genero g JOIN libro_genero lg ON g.id = lg.id_genero JOIN libro l ON lg.id_libro = l.id WHERE l.id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectGenero);
+		ps.setLong(1,  idLibro);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Genero> generos = new ArrayList<Genero>();
+		while(rs.next()) {
+			Long id = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			
+			Genero genero = new Genero(id, nombre);
+			generos.add(genero);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return generos;
+	}
 
 }

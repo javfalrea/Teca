@@ -1,0 +1,93 @@
+package com.teca.service;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.teca.entities.Pelicula;
+import com.teca.entities.PeliculaValoracion;
+import com.teca.util.General;
+
+@Service
+public class PeliculaValoracionService {
+
+	@Autowired
+	private PeliculaService p;
+	
+	public PeliculaValoracion crear(Long idPelicula, Boolean vista, Double valoracion, Boolean fav, String critica) throws SQLException {
+
+		Connection conn = General.conexion();
+
+		String insertValoracion = "INSERT INTO pelicula_valoracion (id_pelicula, vista, valoracion, fav, critica) VALUES (?, ?, ?, ?, ?, ?)";
+
+		PreparedStatement ps = conn.prepareStatement(insertValoracion, Statement.RETURN_GENERATED_KEYS);
+		ps.setLong(1, idPelicula);
+		ps.setBoolean(2, vista);
+		ps.setDouble(3, valoracion);
+		ps.setBoolean(4, fav);
+		ps.setString(5, critica);
+
+		int respuesta = ps.executeUpdate();
+		if (respuesta != 1) {
+			throw new SQLException("No se ha podido crear la valoracion");
+		}
+
+		Pelicula pelicula = p.buscarPorId(idPelicula);
+
+		PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, vista, valoracion, fav, critica);
+
+		ps.close();
+		conn.close();
+
+		return peliculaValoracion;
+	}
+
+	public PeliculaValoracion modificar(Long idPelicula, Boolean vista, Double valoracion, Boolean fav, String critica) throws SQLException {
+		Connection conn = General.conexion();
+
+		String updateValoracion = "UPDATE pelicula_valoracion SET vista = ?, valoracion = ?, fav = ?, critica = ? WHERE id_pelicula = ?";
+
+		PreparedStatement ps = conn.prepareStatement(updateValoracion);
+		ps.setBoolean(1, vista);
+		ps.setDouble(2, valoracion);
+		ps.setBoolean(3, fav);
+		ps.setString(4, critica);
+		ps.setLong(5, idPelicula);
+
+		int respuesta = ps.executeUpdate();
+		if (respuesta != 1) {
+			throw new SQLException("No se ha podido modificar la valoración");
+		}
+
+		Pelicula pelicula = p.buscarPorId(idPelicula);
+
+		PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, vista, valoracion, fav, critica);
+
+		ps.close();
+		conn.close();
+
+		return peliculaValoracion;
+	}
+
+	public void eliminar(Long idPelicula) throws SQLException {
+		Connection conn = General.conexion();
+
+		String deleteValoracion = "DELETE FROM pelicula_valoracion WHERE id_pelicula = ?";
+
+		PreparedStatement ps = conn.prepareStatement(deleteValoracion);
+		ps.setLong(1, idPelicula);
+
+		int respuesta = ps.executeUpdate();
+		if (respuesta != 1) {
+			throw new SQLException("No se ha podido eliminar la valoración");
+		}
+
+		ps.close();
+		conn.close();
+	}
+
+}

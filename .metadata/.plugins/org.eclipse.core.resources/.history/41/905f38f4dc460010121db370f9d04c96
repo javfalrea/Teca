@@ -1,0 +1,346 @@
+let valorada = false;
+let valoracionActualNumerica = 0;
+
+function generarEstrellas(valoracion) {
+    let estrellasHTML = '';
+    const estrellasCompletas = Math.floor(valoracion);
+    const tieneMediaEstrella = valoracion % 1 !== 0;
+
+    const urlEstrellaLlena = "https://images.icon-icons.com/2346/PNG/512/star_filled_icon_142862.png";
+
+
+    // Añadir estrellas completas
+    for (let i = 0; i < estrellasCompletas; i++) {
+        estrellasHTML += `<img src="${urlEstrellaLlena}" alt="estrella completa" style="width:20px; height:auto; vertical-align: middle; margin-right: 0px;">`;
+    }
+
+    // Añadir media estrella si la valoración tiene decimales
+    if (tieneMediaEstrella) {
+        // Asegúrate de que el width del div sea la mitad del width de la estrella completa
+        const starWidth = 20; // Asumiendo que el width de tu estrella completa es 20px
+        const halfStarWidth = starWidth / 2; // 10px en este caso
+
+        estrellasHTML += `
+            <div style="display: inline-block; width: ${halfStarWidth}px; overflow: hidden; height: ${starWidth}px; vertical-align: middle; margin-right: 0px;">
+                <img src="${urlEstrellaLlena}" alt="media estrella" style="width:${starWidth}px; height:auto; display: block; margin-right: 0px">
+            </div>
+        `;
+    }
+
+    return estrellasHTML;
+}
+
+function getIdLibroDesdeUrl() {
+	const params = new URLSearchParams(window.location.search);
+	return params.get('id');
+}
+
+function cargarDetalleLibro() {
+	document.getElementById("autor").innerHTML = "";
+	document.getElementById("genero").innerHTML = "";
+
+	const id = getIdLibroDesdeUrl();
+
+	fetch(`http://localhost:9999/libro/buscarPorId?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(p => {
+			document.getElementById("titulo").textContent = p.titulo;
+			document.getElementById("tituloOriginal").textContent = p.tituloOriginal;
+			document.getElementById("anio").textContent = p.anioLanzamiento;
+			document.getElementById("paginasAprox").textContent = p.paginasAprox;
+			document.getElementById("sinopsis").textContent = p.sinopsis;
+			document.getElementById("imagen").innerHTML = "<img title='" + p.titulo + "' src='" + p.imagen + "'>";
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/genero/buscarPorLibro?idLibro=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(g => {
+			for (let i = 0; i < g.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${g[i].nombre} 
+					<button onclick="eliminarGenero('${g[i].id}')" class="botonPart">Eliminar</button>
+				`;
+				document.getElementById("genero").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/participante/buscarPorLibro?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(a => {
+			for (let i = 0; i < a.length; i++) {
+				const li = document.createElement("li");
+				li.innerHTML = `
+					${a[i].nombre} 
+				  	<button onclick="verDetallesParticipante('${a[i].id}')" class="botonPart">Detalles</button>
+				  	<button onclick="eliminarParticipante('${a[i].id}')" class="botonPart">Eliminar</button>
+				`;
+				document.getElementById("autor").appendChild(li);
+			}
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	fetch(`http://localhost:9999/libroValoracion/buscarPorId?idLibro=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(vp => {
+			valorada = true;
+			valoracionActualNumerica = vp.valoracion;
+			
+			document.getElementById("botonGestionarValoracion").style.display = "none";
+			document.getElementById("botonModificarValoracion").style.display = "block";
+
+			document.getElementById("valoracion").innerHTML = generarEstrellas(vp.valoracion);
+			if (vp.fav) {
+				document.getElementById("corazon").innerHTML = "<img src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Heart_coraz%C3%B3n.svg/800px-Heart_coraz%C3%B3n.svg.png' style='width:20px; height:auto;' alt='Recomendada'>";
+			} else {
+				document.getElementById("corazon").innerHTML = "";
+			}
+			document.getElementById("critica").textContent = vp.critica;
+		})
+		.catch(e => {
+			valorada = false;
+			valoracionActualNumerica = 0;
+			
+			document.getElementById("botonGestionarValoracion").style.display = "block";
+			document.getElementById("botonModificarValoracion").style.display = "none";
+
+			// Limpiar campos de valoración cuando no existe
+			document.getElementById("valoracion").textContent = "";
+			document.getElementById("corazon").innerHTML = "";
+			document.getElementById("critica").textContent = "";
+
+			console.log("Error: " + e.message);
+		});
+}
+
+function abrirGestionarValoracion() {
+	var modal = document.getElementById("modalValoracion");
+	modal.style.display = "block";
+}
+
+function cerrarCrearValoracion() {
+	document.getElementById("valoracionM").value = "";
+	document.getElementById("favM").checked = false;
+	document.getElementById("criticaM").value = "";
+
+	var modal = document.getElementById("modalValoracion");
+	modal.style.display = "none";
+}
+
+function gestionarValoracion() {
+	const id = getIdLibroDesdeUrl();
+	var valoracion = document.getElementById("valoracionM").value;
+	var fav = document.getElementById("favM").checked;
+	var critica = document.getElementById("criticaM").value;
+
+	var url = "";
+	var metodo;
+
+	if (valorada) {
+		url = "http://localhost:9999/libroValoracion/modificar?idLibro=" + encodeURI(id) + "&valoracion=" + encodeURI(valoracion) + "&fav=" + encodeURI(fav) + "&critica=" + encodeURI(critica);
+		metodo = { method: 'PUT' };
+	} else {
+		url = "http://localhost:9999/libroValoracion/crear?idLibro=" + encodeURI(id) + "&valoracion=" + encodeURI(valoracion) + "&fav=" + encodeURI(fav) + "&critica=" + encodeURI(critica);
+		metodo = { method: 'POST' };
+	}
+
+	fetch(url, metodo)
+		.then(res => res.text())
+		.then(res => {
+			cargarDetalleLibro();
+			cerrarCrearValoracion();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+
+}
+
+function abrirModificarValoracion() {
+	const favActual = document.getElementById("corazon").innerHTML !== "";
+	const criticaActual = document.getElementById("critica").textContent;
+
+	document.getElementById("idLibro").value = getIdLibroDesdeUrl();
+	document.getElementById("valoracionM").value = valoracionActualNumerica;
+	document.getElementById("favM").checked = favActual;
+	document.getElementById("criticaM").value = criticaActual;
+
+	var modal = document.getElementById("modalValoracion");
+	modal.style.display = "block";
+}
+
+function verDetallesParticipante(idParticipante) {
+	window.location.href = `detalleParticipante.html?id=${encodeURI(idParticipante)}`;
+}
+
+function eliminarParticipante(idParticipante) {
+	const idLibro = getIdLibroDesdeUrl();
+	if (!confirm("Confirma si quieres suprimir esta participación")) {
+		return;
+	}
+	fetch("http://localhost:9999/libroParticipante/desagregar?idLibro=" + encodeURI(idLibro) + "&idParticipante=" + encodeURI(idParticipante), { method: 'DELETE' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetalleLibro();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		})
+}
+
+function eliminarGenero(idGenero) {
+	const idLibro = getIdLibroDesdeUrl();
+	if (!confirm("Confirma si quieres suprimir este género")) {
+		return;
+	}
+	fetch("http://localhost:9999/libroGenero/desagregar?idLibro=" + encodeURI(idLibro) + "&idGenero=" + encodeURI(idGenero), { method: 'DELETE' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetalleLibro();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		})
+}
+
+function abrirAgregarGenero() {
+	document.getElementById("idGenero").value = getIdLibroDesdeUrl();
+	var modal = document.getElementById("modalAgregarGenero");
+	modal.style.display = "block";
+}
+
+function cerrarAgregarGenero() {
+	document.getElementById("generoM").selectedIndex = 0;
+
+	var modal = document.getElementById("modalAgregarGenero");
+	modal.style.display = "none";
+}
+
+function gestionarAgregarGenero() {
+	var genero = document.getElementById("generoM").value;
+	var libro = getIdLibroDesdeUrl();
+
+	fetch("http://localhost:9999/libroGenero/agregar?idLibro=" + encodeURI(libro) + "&idGenero=" + encodeURI(genero), { method: 'POST' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetalleLibro();
+			cerrarAgregarGenero();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+}
+
+function abrirAgregarParticipante() {
+	document.getElementById("idParticipante").value = getIdLibroDesdeUrl();
+	var modal = document.getElementById("modalAgregarParticipante");
+	modal.style.display = "block";
+}
+
+function cerrarAgregarParticipante() {
+	document.getElementById("participante").selectedIndex = 0;
+
+	var modal = document.getElementById("modalAgregarParticipante");
+	modal.style.display = "none";
+}
+
+function gestionarAgregarParticipante() {
+	var idParticipante = document.getElementById("participante").value;
+	var libro = getIdLibroDesdeUrl();
+
+	fetch("http://localhost:9999/libroParticipante/agregar?idLibro=" + encodeURI(libro) + "&idParticipante=" + encodeURI(idParticipante), { method: 'POST' })
+		.then(res => res.text())
+		.then(res => {
+			cargarDetalleLibro();
+			cerrarAgregarParticipante();
+		})
+		.catch(e => {
+			console.log('Error importando archivo' + e.message);
+		});
+}
+
+function cargaInicial() {
+	let selectParticipante = document.getElementById("participante");
+
+	fetch(`http://localhost:9999/participante/buscarTodos`)
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectParticipante.add(opt);
+			posts.forEach(participnate => {
+				opt = document.createElement("option");
+				opt.value = participnate.id;
+				opt.text = participnate.nombre;
+				selectParticipante.add(opt);
+			});
+		})
+
+	let selectGenero = document.getElementById("generoM");
+
+	fetch(`http://localhost:9999/genero/buscarTodos`)
+		.then(res => res.text())
+		.then(json => {
+			const posts = JSON.parse(json);
+			let opt = document.createElement("option");
+			opt.value = 0;
+			opt.text = "";
+			selectGenero.add(opt);
+			posts.forEach(genero => {
+				opt = document.createElement("option");
+				opt.value = genero.id;
+				opt.text = genero.nombre;
+				selectGenero.add(opt);
+			});
+		})
+}
+
+function abrirModificarLibro() {
+	var id = getIdLibroDesdeUrl();
+	fetch(`http://localhost:9999/libro/buscarPorId?id=${encodeURI(id)}`)
+		.then(res => res.json())
+		.then(p => {
+			document.getElementById("tituloMP").value = p.titulo;
+			document.getElementById("tituloOriginalMP").value = p.tituloOriginal;
+			document.getElementById("anioMP").value = p.anioLanzamiento;
+			document.getElementById("paginasAproxMP").value = p.paginasAprox;
+			document.getElementById("sinopsisMP").value = p.sinopsis;
+			document.getElementById("imagenMP").value = p.imagen;
+		})
+		.catch(e => console.log("Error: " + e.message));
+
+	var modal = document.getElementById("modalLibro");
+	modal.style.display = "block";
+}
+
+function cerrarCrearLibro() {	
+	var modal = document.getElementById("modalLibro");
+	modal.style.display = "none";	
+} 
+
+function modificarLibro() {
+	var idLibro = getIdLibroDesdeUrl();
+	var titulo = document.getElementById("tituloMP").value;
+	var tituloOriginal = document.getElementById("tituloOriginalMP").value;
+	var anioLanzamiento = document.getElementById("anioMP").value;
+	var paginasAprox = document.getElementById("paginasAproxMP").value;
+	var sinopsis = document.getElementById("sinopsisMP").value;
+	var imagen = document.getElementById("imagenMP").value;
+	
+	var url = "http://localhost:9999/libro/modificar?id=" + idLibro + "&titulo=" + titulo + "&tituloOriginal=" + tituloOriginal + "&anioLanzamiento=" + anioLanzamiento + "&paginasAprox=" + paginasAprox + "&sinopsis=" + sinopsis + "&imagen=" + imagen;
+
+	fetch(url, { method:'PUT' })
+	.then(res => res.text())
+	.then(res => {
+		cargarDetalleLibro();
+		cerrarCrearLibro();
+	})
+	.catch(e => {
+		console.log('Error importando archivo' + e.message);
+	});
+	
+}

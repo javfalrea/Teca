@@ -45,7 +45,7 @@ public class ParticipanteService {
 		
 		Long id = General.obtenerClaveGenerada(ps);
 		
-		Pais pais = s.buscarPorParticipante(idPais);
+		Pais pais = s.buscarPorParticipante(id);
 		
 		Participante participante = new Participante(id, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
 		
@@ -104,7 +104,7 @@ public class ParticipanteService {
 		conn.close();
 	}
 	
-	public List<Participante> buscarTodo() throws SQLException {
+	public List<Participante> buscarTodos() throws SQLException {
 		Connection conn = General.conexion();
 		
 		String selectParticipante = "SELECT * FROM participante";
@@ -119,9 +119,8 @@ public class ParticipanteService {
 			Date fechaNacimiento = rs.getDate("fecha_nacimiento");
 			Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
 			String imagen = rs.getString("imagen");
-			Long idPais = rs.getLong("id_pais");
 			
-			Pais pais = s.buscarPorParticipante(idPais);
+			Pais pais = s.buscarPorParticipante(id);
 			
 			Participante participante = new Participante(id, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
 			participantes.add(participante);
@@ -148,9 +147,8 @@ public class ParticipanteService {
 		Date fechaNacimiento = rs.getDate("fecha_nacimiento");
 		Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
 		String imagen = rs.getString("imagen");
-		Long idPais = rs.getLong("id_pais");
 			
-		Pais pais = s.buscarPorParticipante(idPais);
+		Pais pais = s.buscarPorParticipante(id);
 			
 		Participante participante = new Participante(id, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);		
 		
@@ -161,6 +159,160 @@ public class ParticipanteService {
 		return participante;
 	}
 	
+	public List<Participante> buscarActorPorPelicula(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectParticipante = "SELECT * FROM participante pa JOIN pelicula_participante pp ON pa.id = pp.id_participante JOIN pelicula pe ON pp.id_pelicula = pe.id WHERE pe.id = ? AND pp.es_actor = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectParticipante);
+		ps.setLong(1, id);
+		ps.setBoolean(2, true);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Participante> participantes = new ArrayList<Participante>();
+		while(rs.next()) {
+			Long idParticipante = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			Date fechaNacimiento = rs.getDate("fecha_nacimiento");
+			Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = s.buscarPorParticipante(idParticipante);
+			
+			Participante participante = new Participante(idParticipante, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
+			participantes.add(participante);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return participantes;
+	}
+	
+	public List<Participante> buscarDirectorPorPelicula(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectParticipante = "SELECT * FROM participante pa JOIN pelicula_participante pp ON pa.id = pp.id_participante JOIN pelicula pe ON pp.id_pelicula = pe.id WHERE pe.id = ? AND pp.es_director = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectParticipante);
+		ps.setLong(1, id);
+		ps.setBoolean(2, true);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Participante> participantes = new ArrayList<Participante>();
+		while(rs.next()) {
+			Long idParticipante = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			Date fechaNacimiento = rs.getDate("fecha_nacimiento");
+			Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = s.buscarPorParticipante(idParticipante);
+			
+			Participante participante = new Participante(idParticipante, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
+			participantes.add(participante);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return participantes;
+	}
+	
+	public List<Participante> buscarActorPorSerie(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectParticipante = "SELECT * FROM participante pa JOIN serie_participante sp ON pa.id = sp.id_participante JOIN serie s ON sp.id_serie = s.id WHERE s.id = ? AND sp.es_actor = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectParticipante);
+		ps.setLong(1, id);
+		ps.setBoolean(2, true);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Participante> participantes = new ArrayList<Participante>();
+		while(rs.next()) {
+			Long idParticipante = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			Date fechaNacimiento = rs.getDate("fecha_nacimiento");
+			Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = s.buscarPorParticipante(idParticipante);
+			
+			Participante participante = new Participante(idParticipante, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
+			participantes.add(participante);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return participantes;
+	}
+	
+	public List<Participante> buscarDirectorPorSerie(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectParticipante = "SELECT * FROM participante pa JOIN serie_participante sp ON pa.id = sp.id_participante JOIN serie s ON sp.id_serie = s.id WHERE s.id = ? AND sp.es_director = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectParticipante);
+		ps.setLong(1, id);
+		ps.setBoolean(2, true);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Participante> participantes = new ArrayList<Participante>();
+		while(rs.next()) {
+			Long idParticipante = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			Date fechaNacimiento = rs.getDate("fecha_nacimiento");
+			Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = s.buscarPorParticipante(idParticipante);
+			
+			Participante participante = new Participante(idParticipante, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
+			participantes.add(participante);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return participantes;
+	}
+	
+	public List<Participante> buscarPorLibro(Long id) throws SQLException {
+		Connection conn = General.conexion();
+		
+		String selectParticipante = "SELECT * FROM participante pa JOIN libro_participante lp ON pa.id = lp.id_participante JOIN libro l ON lp.id_libro = l.id WHERE l.id = ?";
+		
+		PreparedStatement ps = conn.prepareStatement(selectParticipante);
+		ps.setLong(1, id);
+		
+		ResultSet rs = ps.executeQuery();
+		List<Participante> participantes = new ArrayList<Participante>();
+		while(rs.next()) {
+			Long idParticipante = rs.getLong("id");
+			String nombre = rs.getString("nombre");
+			Date fechaNacimiento = rs.getDate("fecha_nacimiento");
+			Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
+			String imagen = rs.getString("imagen");
+			
+			Pais pais = s.buscarPorParticipante(idParticipante);
+			
+			Participante participante = new Participante(idParticipante, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
+			participantes.add(participante);
+		}
+		
+		rs.close();
+		ps.close();
+		conn.close();
+		
+		return participantes;
+	}
+		
 	public List<Participante> buscarPorNombre(String nombreBq) throws SQLException {
 		Connection conn = General.conexion();
 		
@@ -181,9 +333,8 @@ public class ParticipanteService {
 			Date fechaNacimiento = rs.getDate("fecha_nacimiento");
 			Date fechaFallecimiento = rs.getDate("fecha_fallecimiento");
 			String imagen = rs.getString("imagen");
-			Long idPais = rs.getLong("id_pais");
 			
-			Pais pais = s.buscarPorParticipante(idPais);
+			Pais pais = s.buscarPorParticipante(id);
 			
 			Participante participante = new Participante(id, nombre, fechaNacimiento, fechaFallecimiento, imagen, pais);
 			participantes.add(participante);

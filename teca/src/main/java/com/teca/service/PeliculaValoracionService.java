@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.teca.entities.Pelicula;
 import com.teca.entities.PeliculaValoracion;
-import com.teca.entities.Usuario;
 import com.teca.util.General;
 
 @Service
@@ -19,23 +18,18 @@ public class PeliculaValoracionService {
 
 	@Autowired
 	private PeliculaService p;
-
-	@Autowired
-	private UsuarioService u;
-
-	public PeliculaValoracion crear(Long idPelicula, Long idUsuario, Boolean vista, Double valoracion, Boolean fav, String critica) throws SQLException {
+	
+	public PeliculaValoracion crear(Long idPelicula, Double valoracion, Boolean fav, String critica) throws SQLException {
 
 		Connection conn = General.conexion();
 
-		String insertValoracion = "INSERT INTO pelicula_valoracion (id_pelicula, id_usuario, vista, valoracion, fav, critica) VALUES (?, ?, ?, ?, ?, ?)";
+		String insertValoracion = "INSERT INTO pelicula_valoracion (id_pelicula, valoracion, fav, critica) VALUES (?, ?, ?, ?)";
 
 		PreparedStatement ps = conn.prepareStatement(insertValoracion, Statement.RETURN_GENERATED_KEYS);
 		ps.setLong(1, idPelicula);
-		ps.setLong(2, idUsuario);
-		ps.setBoolean(3, vista);
-		ps.setDouble(4, valoracion);
-		ps.setBoolean(5, fav);
-		ps.setString(6, critica);
+		ps.setDouble(2, valoracion);
+		ps.setBoolean(3, fav);
+		ps.setString(4, critica);
 
 		int respuesta = ps.executeUpdate();
 		if (respuesta != 1) {
@@ -44,9 +38,7 @@ public class PeliculaValoracionService {
 
 		Pelicula pelicula = p.buscarPorId(idPelicula);
 
-		Usuario usuario = u.buscarPorId(idUsuario);
-
-		PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, usuario, vista, valoracion, fav, critica);
+		PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, valoracion, fav, critica);
 
 		ps.close();
 		conn.close();
@@ -54,18 +46,16 @@ public class PeliculaValoracionService {
 		return peliculaValoracion;
 	}
 
-	public PeliculaValoracion modificar(Long idPelicula, Long idUsuario, Boolean vista, Double valoracion, Boolean fav, String critica) throws SQLException {
+	public PeliculaValoracion modificar(Long idPelicula, Double valoracion, Boolean fav, String critica) throws SQLException {
 		Connection conn = General.conexion();
 
-		String updateValoracion = "UPDATE pelicula_valoracion SET vista = ?, valoracion = ?, fav = ?, critica = ? WHERE id_pelicula = ? AND id_usuario = ?";
+		String updateValoracion = "UPDATE pelicula_valoracion SET valoracion = ?, fav = ?, critica = ? WHERE id_pelicula = ?";
 
 		PreparedStatement ps = conn.prepareStatement(updateValoracion);
-		ps.setBoolean(1, vista);
-		ps.setDouble(2, valoracion);
-		ps.setBoolean(3, fav);
-		ps.setString(4, critica);
-		ps.setLong(5, idPelicula);
-		ps.setLong(6, idUsuario);
+		ps.setDouble(1, valoracion);
+		ps.setBoolean(2, fav);
+		ps.setString(3, critica);
+		ps.setLong(4, idPelicula);
 
 		int respuesta = ps.executeUpdate();
 		if (respuesta != 1) {
@@ -74,9 +64,7 @@ public class PeliculaValoracionService {
 
 		Pelicula pelicula = p.buscarPorId(idPelicula);
 
-		Usuario usuario = u.buscarPorId(idUsuario);
-
-		PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, usuario, vista, valoracion, fav, critica);
+		PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, valoracion, fav, critica);
 
 		ps.close();
 		conn.close();
@@ -84,14 +72,13 @@ public class PeliculaValoracionService {
 		return peliculaValoracion;
 	}
 
-	public void eliminar(Long idPelicula, Long idUsuario) throws SQLException {
+	public void eliminar(Long idPelicula) throws SQLException {
 		Connection conn = General.conexion();
 
-		String deleteValoracion = "DELETE FROM pelicula_valoracion WHERE id_pelicula = ? AND id_usuario = ?";
+		String deleteValoracion = "DELETE FROM pelicula_valoracion WHERE id_pelicula = ?";
 
 		PreparedStatement ps = conn.prepareStatement(deleteValoracion);
 		ps.setLong(1, idPelicula);
-		ps.setLong(2, idUsuario);
 
 		int respuesta = ps.executeUpdate();
 		if (respuesta != 1) {
@@ -101,35 +88,38 @@ public class PeliculaValoracionService {
 		ps.close();
 		conn.close();
 	}
-
-	public PeliculaValoracion buscarPorPeliculaYUsuario(Long idPelicula, Long idUsuario) throws SQLException {
-		Connection conn = General.conexion();
-
-		String selectValoracion = "SELECT * FROM pelicula_valoracion WHERE id_pelicula = ? AND id_usuario = ?";
-
-		PreparedStatement ps = conn.prepareStatement(selectValoracion);
-		ps.setLong(1, idPelicula);
-		ps.setLong(2, idUsuario);
-
-		ResultSet rs = ps.executeQuery();
-		rs.next();
-		Boolean vista = rs.getBoolean("vista");
-		Double valoracion = rs.getDouble("valoracion");
-		Boolean fav = rs.getBoolean("fav");
-		String critica = rs.getString("critica");
-
-		Pelicula pelicula = p.buscarPorId(idPelicula);
-
-		Usuario usuario = u.buscarPorId(idUsuario);
-
-		PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, usuario, vista, valoracion, fav,
-				critica);
-
-		rs.close();
-		ps.close();
-		conn.close();
-
-		return peliculaValoracion;
+	
+	public PeliculaValoracion buscarPorId(Long idPelicula) throws SQLException {
+	    Connection conn = General.conexion();
+	    
+	    String selectValoracion = "SELECT * FROM pelicula_valoracion WHERE id_pelicula = ?";
+	    
+	    PreparedStatement ps = conn.prepareStatement(selectValoracion);
+	    ps.setLong(1, idPelicula);
+	    
+	    ResultSet rs = ps.executeQuery();
+	    
+	    if (rs.next()) {
+	        Double valoracion = rs.getDouble("valoracion");
+	        Boolean fav = rs.getBoolean("fav");
+	        String critica = rs.getString("critica");
+	        
+	        Pelicula pelicula = p.buscarPorId(idPelicula);
+	        
+	        PeliculaValoracion peliculaValoracion = new PeliculaValoracion(pelicula, valoracion, fav, critica);
+	        
+	        rs.close();
+	        ps.close();
+	        conn.close();
+	        
+	        return peliculaValoracion;
+	    } else {
+	        rs.close();
+	        ps.close();
+	        conn.close();
+	        
+	        return null;
+	    }
 	}
-
+	
 }

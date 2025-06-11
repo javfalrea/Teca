@@ -1,0 +1,89 @@
+function buscarPaises() {	
+	var nombre = document.getElementById("nombrePais").value.trim();
+
+	fetch("http://localhost:9999/pais/buscarPorNombre?nombre=" + nombre)
+	.then(res => res.text())
+	.then(json => {
+		const posts = JSON.parse(json);
+		let tabla = "";
+		posts.forEach(fila => {
+			tabla += "<tr>";
+			tabla += "<td>" + fila.nombre + "</td>";
+			tabla += "<td><img title='" + fila.nombre + "' src='" + fila.bandera + "' style='width:16px; height:auto; display:block; margin:auto;'></td>";
+			tabla += "<td><button onclick=\"abrirModificarPais('" + fila.id + "','" + fila.nombre + "','"+ fila.bandera + "')\">Modificar</button><button onclick=\"eliminarPais('" + fila.id + "')\">Eliminar</button></td>";
+			tabla += "</tr>";
+		});	
+		
+		var contenidoTabla = document.getElementById("contenidoTabla");		
+		contenidoTabla.innerHTML = tabla;
+		
+	})
+	.catch(e => {
+		console.log('Error importando archivo: ' + e.message);
+	});
+}
+
+function abrirCrearPais() {
+	var modal = document.getElementById("modalPais");
+	modal.style.display = "block";
+}
+
+function abrirModificarPais(id, continente, nombre) {
+	document.getElementById("idPais").value = id;
+	document.getElementById("nombre").value = nombre;
+	document.getElementById("bandera").value = bandera;
+
+	var modal = document.getElementById("modalPais");
+	modal.style.display = "block";	
+}
+
+function cerrarCrearPais() {
+	document.getElementById("idPais").value = "";
+	document.getElementById("nombre").value = "";
+	document.getElementById("bandera").value = "";
+		
+	var modal = document.getElementById("modalPais");
+	modal.style.display = "none";	
+}
+
+function gestionarPais() {
+	var idPais = document.getElementById("idPais").value;
+	var nombre = document.getElementById("nombre").value;
+	var bandera = document.getElementById("bandera").value;
+	
+	var url="";
+	var metodo;
+	
+	if(idPais != "") {
+		url = "http://localhost:9999/pais/modificar?id=" + idPais + "&nombre=" + nombre + "&bandera=" + bandera;
+		metodo = { method:'PUT' };
+	} else {
+		url = "http://localhost:9999/pais/crear?nombre=" + nombre + "&bandera=" + bandera;
+		metodo = { method:'POST' };
+	}
+	
+	fetch(url, metodo)
+	.then(res => res.text())
+	.then(res => {
+		buscarPaises();
+		cerrarCrearPais();
+	})
+	.catch(e => {
+		console.log('Error importando archivo' + e.message);
+	});
+	
+}
+
+function eliminarPais(idPais) {
+	if(!confirm("Confirma si quieres eliminarlo")) {
+		return;
+	}
+	fetch("http://localhost:9999/pais/eliminar?id=" + idPais, { method:'DELETE' })
+	.then(res => res.text())
+	.then(res => {
+		buscarPaises();
+	})
+	.catch(e => {
+		console.log('Error importando archivo' + e.message);
+	})
+}

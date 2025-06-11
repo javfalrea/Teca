@@ -3,16 +3,12 @@ package com.teca.entities;
 public class PeliculaValoracion {
 	
 	private Pelicula pelicula;
-	private Usuario usuario;
-	private Boolean vista;
 	private Double valoracion;
 	private Boolean fav;
 	private String critica;
 	
-	public PeliculaValoracion(Pelicula pelicula, Usuario usuario, Boolean vista, Double valoracion, Boolean fav, String critica) {
+	public PeliculaValoracion(Pelicula pelicula, Double valoracion, Boolean fav, String critica) {
 		this.pelicula = pelicula;
-		this.usuario = usuario;
-		this.vista = vista;
 		this.valoracion = valoracion;
 		this.fav = fav;
 		this.critica = critica;
@@ -24,22 +20,6 @@ public class PeliculaValoracion {
 
 	public void setPelicula(Pelicula pelicula) {
 		this.pelicula = pelicula;
-	}
-
-	public Usuario getUsuario() {
-		return usuario;
-	}
-
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
-
-	public Boolean getVista() {
-		return vista;
-	}
-
-	public void setVista(Boolean vista) {
-		this.vista = vista;
 	}
 
 	public Double getValoracion() {

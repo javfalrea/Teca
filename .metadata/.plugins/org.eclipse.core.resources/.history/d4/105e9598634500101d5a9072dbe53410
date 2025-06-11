@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Géneros</title>
+    <link rel="stylesheet" href="tablas.css">
+</head>
+<body>
+
+    <h1>Géneros</h1>
+	
+	<div class="paginas">
+	    <button onclick="location.href='index.html'">Volver</button>
+	</div>
+
+    <div class="filtros">
+		<input type="text" id="nombreGenero" placeholder="Genero">
+		<button id="buscarGeneros" onclick="buscarGeneros()">Buscar</button>       
+        <button id="botonCrearGenero" onclick="abrirCrearGenero()">Insertar Género</button>
+    </div>
+
+    <table id="tablaGeneros">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="contenidoTabla"></tbody>
+    </table>
+
+    <div id="modalGenero" class="modal" style="display: none;">
+        <div class="contenidoModal">
+            <h2 style="text-align: center;">Nuevo Género</h2>
+			<label for="nombre">Nombre</label>
+			<input type="text" name="nombre" id="nombre">
+
+            <div style="display: flex; justify-content: space-around;">
+				<button onclick="gestionarGenero()">Aceptar</button>
+				<button onclick="cerrarCrearGenero()">Cancelar</button>
+			</div>
+			<input type="hidden" id="idGenero">
+           
+        </div>
+    </div>
+
+    <script src="/js/genero.js"></script>
+</body>
+</html>
+
+
+
